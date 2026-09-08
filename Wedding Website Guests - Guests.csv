@@ -1,0 +1,5 @@
+Name,Wedding Party (TRUE/FALSE),Plus-One Allowed (TRUE/FALSE),Invited Events (semicolon-separated),Type,LinkedTo
+Jenny Chen,TRUE,TRUE,ceremony;reception,Main,
+Max Rivera,TRUE,TRUE,ceremony;reception,PlusOne,Jenny Chen
+Alice Wong,TRUE,FALSE,ceremony;reception,Main,
+Tom Baker,FALSE,TRUE,ceremony;reception,PlusOne,Alice Wong
