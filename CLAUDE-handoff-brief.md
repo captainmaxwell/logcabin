@@ -7,7 +7,7 @@ that file automatically at the start of every session.
 
 ## What this is
 
-A wedding website for Jenny & Max's wedding — October 3, 2026, San Francisco.
+A wedding website for Jenny & Max's wedding — May 1, 2027, San Francisco.
 Guests log in by typing their name (matched against a guest list, not a real
 auth system), see event details, and RSVP. Wedding-party members additionally
 see rehearsal dinner details, but only after they RSVP "yes."
