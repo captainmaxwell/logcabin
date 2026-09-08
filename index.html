@@ -134,10 +134,28 @@ const PUBLIC_EVENTS = [
 ];
 const REHEARSAL_DINNER = { title: "Rehearsal Dinner", date: "Friday, April 30, 2027", time: "7:00 PM", location: "Liholiho Yacht Club", detail: "Wedding party and partners. Casual dress, no speeches — we promise." };
 
+// Normalizes a name for matching: strips accents (José -> jose), normalizes
+// curly quotes to straight ones (O'Brien either way), collapses any run of
+// whitespace to a single space, trims, and lowercases. Applied to BOTH sides
+// of every name comparison in this app (here and in the Apps Script) so a
+// stray space or missing accent on either side of the match doesn't matter.
+function normalizeName(str) {
+  return String(str || "")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[\u2018\u2019\u02bc]/g, "'")
+    .trim().replace(/\s+/g, " ")
+    .toLowerCase();
+}
+
 async function findGuest(input) {
-  const norm = input.trim().toLowerCase().replace(/\s+/g, " ");
+  const norm = normalizeName(input);
   const guests = await fetchGuests();
-  return guests.find(g => g.name.toLowerCase() === norm);
+  const match = guests.find(g => normalizeName(g.name) === norm);
+  if (!match) return match;
+  // Matching tolerates messy whitespace in the sheet, but display (e.g. the
+  // "Hi {first name}" greeting) shouldn't show that mess — clean it up here,
+  // once, at the source, rather than at every place g.name gets displayed.
+  return { ...match, name: match.name.trim().replace(/\s+/g, " ") };
 }
 
 /* ---------- admin note ----------
