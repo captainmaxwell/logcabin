@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Jenny & Max</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #FBF3E7;
+    --sangria: #B5324A;
+    --plum: #3D2621;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--cream);
+    color: var(--plum);
+    font-family: 'Kalam', cursive;
+    font-weight: 400;
+  }
+  .display { font-weight: 700; }
+  .border-row { position: fixed; left: 0; width: 100%; z-index: 1; pointer-events: none; }
+  .border-row.top { top: 10px; }
+  .border-row.bottom { bottom: 10px; transform: scaleY(-1); }
+  .squiggle-strip { display:block; }
+  h1, h2 { font-weight: 700; margin: 0; }
+  input, select, textarea, button { font-family: 'Kalam', cursive; font-size: 15px; }
+  .field {
+    width: 100%; padding: 10px 14px; border: 2.5px solid var(--plum);
+    border-radius: 14px; background: white; color: var(--plum);
+  }
+  .btn {
+    border: 2.5px solid var(--plum); background: var(--sangria); color: var(--cream);
+    font-weight: 700; padding: 10px 22px; border-radius: 999px; cursor: pointer;
+  }
+  .btn.secondary { background: white; color: var(--plum); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .tab-btn {
+    background: none; border: none; border-bottom: 3px solid transparent;
+    padding: 8px 2px; margin-right: 24px; cursor: pointer; color: var(--plum); opacity: 0.55; font-size: 15px;
+  }
+  .tab-btn.active { border-bottom-color: var(--sangria); opacity: 1; }
+  .card {
+    border: 2.5px solid var(--plum); border-radius: 16px; padding: 18px 22px;
+    margin-bottom: 14px; max-width: 520px; background: white;
+  }
+  .card.rehearsal { border-color: var(--sangria); }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { border: 1.5px solid var(--plum); padding: 8px 10px; text-align: left; vertical-align: top; }
+  th { background: var(--sangria); color: var(--cream); }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* ---------- squiggle + bridge doodles ---------- */
+function squiggleSvg() {
+  return `<svg class="squiggle-strip" viewBox="0 0 800 20" preserveAspectRatio="none" height="16" width="100%">
+    <path d="M0 10 Q 20 0, 40 10 T 80 10 T 120 10 T 160 10 T 200 10 T 240 10 T 280 10 T 320 10 T 360 10 T 400 10 T 440 10 T 480 10 T 520 10 T 560 10 T 600 10 T 640 10 T 680 10 T 720 10 T 760 10 T 800 10"
+      fill="none" stroke="#B5324A" stroke-width="4" stroke-linecap="round"/>
+  </svg>`;
+}
+function bridgeSvg() {
+  return `<svg viewBox="0 0 200 90" style="width:150px; display:block; margin:10px auto;">
+    <line x1="0" y1="70" x2="200" y2="70" stroke="#B5324A" stroke-width="4" stroke-linecap="round"/>
+    <line x1="55" y1="12" x2="50" y2="70" stroke="#B5324A" stroke-width="4" stroke-linecap="round"/>
+    <line x1="145" y1="12" x2="150" y2="70" stroke="#B5324A" stroke-width="4" stroke-linecap="round"/>
+    <line x1="45" y1="12" x2="65" y2="12" stroke="#B5324A" stroke-width="4" stroke-linecap="round"/>
+    <line x1="135" y1="12" x2="155" y2="12" stroke="#B5324A" stroke-width="4" stroke-linecap="round"/>
+    <path d="M2 68 Q 52 15, 100 45 T 198 68" fill="none" stroke="#B5324A" stroke-width="3" stroke-linecap="round"/>
+    <line x1="20" y1="55" x2="20" y2="69" stroke="#B5324A" stroke-width="2"/>
+    <line x1="35" y1="35" x2="35" y2="69" stroke="#B5324A" stroke-width="2"/>
+    <line x1="65" y1="20" x2="65" y2="69" stroke="#B5324A" stroke-width="2"/>
+    <line x1="80" y1="30" x2="80" y2="69" stroke="#B5324A" stroke-width="2"/>
+    <line x1="120" y1="30" x2="120" y2="69" stroke="#B5324A" stroke-width="2"/>
+    <line x1="135" y1="20" x2="135" y2="69" stroke="#B5324A" stroke-width="2"/>
+    <line x1="165" y1="35" x2="165" y2="69" stroke="#B5324A" stroke-width="2"/>
+    <line x1="180" y1="55" x2="180" y2="69" stroke="#B5324A" stroke-width="2"/>
+  </svg>`;
+}
+
+/* ---------- backend config ---------- */
+const CONFIG = {
+  RSVP_API_URL: "https://script.google.com/macros/s/AKfycbwjuJKl9mengAxhJKlfT0dOCo9zMIP9zbs5HVS1KGV-DSwjYDksznO13iUdsUVoyciY/exec",
+};
+
+/* ---------- guest data (fetched live from your Apps Script, which reads the Guests tab) ---------- */
+let guestsCache = null;
+
+async function fetchGuests() {
+  if (guestsCache) return guestsCache;
+  const res = await fetch(`${CONFIG.RSVP_API_URL}?action=guests`);
+  const data = await res.json();
+  guestsCache = data.guests || [];
+  return guestsCache;
+}
+
+const PUBLIC_EVENTS = [
+  { id: "ceremony", title: "Ceremony", date: "Saturday, October 3, 2026", time: "4:00 PM", location: "Lovers' Lane, Presidio", detail: "An outdoor ceremony under the eucalyptus, fog permitting. Seating starts at 3:30." },
+  { id: "reception", title: "Reception", date: "Saturday, October 3, 2026", time: "6:00 PM", location: "The Interval at Fort Mason", detail: "Dinner, toasts, and dancing with the bay right outside the window." },
+];
+const REHEARSAL_DINNER = { title: "Rehearsal Dinner", date: "Friday, October 2, 2026", time: "7:00 PM", location: "Liholiho Yacht Club", detail: "Wedding party and partners. Casual dress, no speeches — we promise." };
+
+async function findGuest(input) {
+  const norm = input.trim().toLowerCase().replace(/\s+/g, " ");
+  const guests = await fetchGuests();
+  return guests.find(g => g.name.toLowerCase() === norm);
+}
+
+/* ---------- admin note ----------
+   Passcode is now checked server-side in the Apps Script itself, not here —
+   this file no longer needs to know it at all. */
+
+/* ---------- app state ---------- */
+const state = {
+  view: "login",         // login | site | admin-login | admin
+  guest: null,
+  activeTab: "events",
+  rsvp: { status: null, mealSelf: "", dietarySelf: "", plusOneName: "", mealPlusOne: "", songRequest: "", note: "" },
+  rsvpSubmitted: false,
+  rsvpEditing: false,
+  rsvpSaving: false,
+  loginError: "",
+  adminError: "",
+  adminRows: null,      // null = not loaded yet
+  adminLoading: false,
+  adminPasscode: "",    // kept only so "Refresh" can re-authenticate
+};
+
+const TABS = [
+  { id: "story", label: "Our story" },
+  { id: "events", label: "Events" },
+  { id: "rsvp", label: "RSVP" },
+  { id: "travel", label: "Travel" },
+  { id: "registry", label: "Registry" },
+  { id: "faq", label: "FAQ" },
+];
+
+function eventCardHtml(ev, rehearsal) {
+  return `<div class="card ${rehearsal ? 'rehearsal' : ''}">
+    <div class="display" style="font-size:20px;">${ev.title}</div>
+    <div style="font-size:13px; opacity:0.7; margin:4px 0 8px;">${ev.date} &middot; ${ev.time} &middot; ${ev.location}</div>
+    <div style="font-size:14px; max-width:46ch;">${ev.detail}</div>
+  </div>`;
+}
+
+/* ---------- backend calls (Apps Script Web App) ---------- */
+async function saveRsvp(guest, rsvp) {
+  const record = {
+    guestName: guest.name,
+    isWeddingParty: guest.isWeddingParty,
+    status: rsvp.status,
+    mealSelf: rsvp.mealSelf,
+    dietarySelf: rsvp.dietarySelf,
+    plusOneName: rsvp.plusOneName,
+    mealPlusOne: rsvp.mealPlusOne,
+    songRequest: rsvp.songRequest,
+    note: rsvp.note,
+  };
+  // Sent as a plain-text body (not application/json) so the browser doesn't
+  // send a CORS preflight OPTIONS request, which Apps Script doesn't handle.
+  await fetch(CONFIG.RSVP_API_URL, { method: "POST", body: JSON.stringify(record) });
+  return record;
+}
+async function loadRsvp(guest) {
+  try {
+    const url = `${CONFIG.RSVP_API_URL}?action=myrsvp&name=${encodeURIComponent(guest.name)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    return data.row || null;
+  } catch (e) {
+    return null;
+  }
+}
+async function loadAllRsvps(passcode) {
+  const url = `${CONFIG.RSVP_API_URL}?action=rsvps&passcode=${encodeURIComponent(passcode)}`;
+  const res = await fetch(url);
+  const data = await res.json();
+  if (data.error) throw new Error(data.error);
+  const rows = data.rows || [];
+  rows.sort((a, b) => (a.timestamp < b.timestamp ? 1 : -1));
+  return rows;
+}
+function rowsToCsv(rows) {
+  const cols = ["guestName","isWeddingParty","status","mealSelf","dietarySelf","plusOneName","mealPlusOne","songRequest","note","timestamp"];
+  const esc = (v) => {
+    const s = (v === undefined || v === null) ? "" : String(v);
+    return '"' + s.replace(/"/g, '""') + '"';
+  };
+  const lines = [cols.join(",")];
+  rows.forEach(r => lines.push(cols.map(c => esc(r[c])).join(",")));
+  return lines.join("\r\n");
+}
+function downloadCsv(csvText, filename) {
+  const blob = new Blob([csvText], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/* ---------- render ---------- */
+function render() {
+  const app = document.getElementById("app");
+
+  if (state.view === "login") {
+    app.innerHTML = `
+      <div class="border-row top">${squiggleSvg()}</div>
+      <div class="border-row bottom">${squiggleSvg()}</div>
+      <div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;">
+        <div style="text-align:center; max-width:400px; width:100%;">
+          <div style="display:inline-block; border:2.5px solid var(--sangria); color:var(--sangria); padding:6px 20px; border-radius:999px; font-size:12px; font-weight:700; letter-spacing:0.08em; margin-bottom:22px;">YOU'RE INVITED</div>
+          <h1 class="display" style="font-size:60px; color:var(--sangria);">Jenny &amp; Max</h1>
+          ${bridgeSvg()}
+          <div class="display" style="font-size:21px; margin:10px 0 22px;">are tying the knot!</div>
+          <div style="font-size:14px; opacity:0.75; margin-bottom:26px;">October 3, 2026 &middot; San Francisco, CA</div>
+          <form id="login-form">
+            <input id="login-name" class="field" type="text" placeholder="Enter your full name" style="text-align:center; margin-bottom:12px;" autocomplete="off" />
+            ${state.loginError ? `<div style="color:var(--sangria); font-size:13px; margin-bottom:12px;">${state.loginError}</div>` : ""}
+            <button type="submit" class="btn" style="width:100%;">Let's go &rarr;</button>
+          </form>
+          <div style="font-size:12px; opacity:0.55; margin-top:16px;">Enter your name exactly as it appears on your invitation</div>
+          <div style="margin-top:26px;">
+            <a href="#" id="admin-link" style="font-size:12px; opacity:0.5; color:var(--plum);">Wedding admin</a>
+          </div>
+        </div>
+      </div>`;
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const nameInput = document.getElementById("login-name").value;
+      const submitBtn = e.target.querySelector("button[type=submit]");
+      submitBtn.disabled = true; submitBtn.textContent = "One sec…";
+      let g;
+      try {
+        g = await findGuest(nameInput);
+      } catch (err) {
+        state.loginError = "Couldn't reach the guest list right now — please try again in a moment.";
+        render();
+        return;
+      }
+      if (!g) {
+        state.loginError = "We couldn't find that name on our list. Try your full first and last name, as it appears on your invitation.";
+        render();
+        return;
+      }
+      state.loginError = "";
+      state.guest = g;
+      state.rsvpEditing = false;
+      const existing = await loadRsvp(g);
+      if (existing) {
+        state.rsvp = {
+          status: existing.status, mealSelf: existing.mealSelf || "", dietarySelf: existing.dietarySelf || "",
+          plusOneName: existing.plusOneName || "", mealPlusOne: existing.mealPlusOne || "",
+          songRequest: existing.songRequest || "", note: existing.note || "",
+        };
+        state.rsvpSubmitted = true;
+      }
+      state.view = "site";
+      render();
+    });
+    document.getElementById("admin-link").addEventListener("click", (e) => {
+      e.preventDefault();
+      state.view = "admin-login";
+      render();
+    });
+    return;
+  }
+
+  if (state.view === "admin-login") {
+    app.innerHTML = `
+      <div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;">
+        <div style="text-align:center; max-width:360px; width:100%;">
+          <h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:16px;">Wedding admin</h2>
+          <form id="admin-form">
+            <input id="admin-pass" class="field" type="password" placeholder="Passcode" style="text-align:center; margin-bottom:12px;" />
+            ${state.adminError ? `<div style="color:var(--sangria); font-size:13px; margin-bottom:12px;">${state.adminError}</div>` : ""}
+            <button type="submit" class="btn" style="width:100%;">Enter</button>
+          </form>
+          <div style="margin-top:20px;"><a href="#" id="back-link" style="font-size:12px; opacity:0.6; color:var(--plum);">&larr; Back to guest login</a></div>
+        </div>
+      </div>`;
+    document.getElementById("admin-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const val = document.getElementById("admin-pass").value;
+      const submitBtn = e.target.querySelector("button[type=submit]");
+      submitBtn.disabled = true; submitBtn.textContent = "Checking…";
+      try {
+        const rows = await loadAllRsvps(val);
+        state.adminError = "";
+        state.adminPasscode = val;
+        state.adminRows = rows;
+        state.view = "admin";
+        render();
+      } catch (err) {
+        state.adminError = "That's not the right passcode.";
+        render();
+      }
+    });
+    document.getElementById("back-link").addEventListener("click", (e) => {
+      e.preventDefault(); state.view = "login"; render();
+    });
+    return;
+  }
+
+  if (state.view === "admin") {
+    const rows = state.adminRows || [];
+    const yesCount = rows.filter(r => r.status === "yes").length;
+    const noCount = rows.filter(r => r.status === "no").length;
+    app.innerHTML = `
+      <div style="max-width:900px; margin:0 auto; padding:32px 24px 60px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:18px;">
+          <h2 class="display" style="font-size:28px; color:var(--sangria);">RSVP responses</h2>
+          <div>
+            <button id="refresh-btn" class="btn secondary" style="margin-right:8px;">Refresh</button>
+            <button id="export-btn" class="btn" ${rows.length === 0 ? "disabled" : ""}>Export CSV</button>
+          </div>
+        </div>
+        <div style="font-size:14px; margin-bottom:18px;">${state.adminLoading ? "Loading…" : `${yesCount} attending &middot; ${noCount} declined &middot; ${rows.length} total responses`}</div>
+        ${rows.length === 0 && !state.adminLoading ? `<div style="font-size:14px; opacity:0.7;">No responses yet.</div>` : ""}
+        ${rows.length > 0 ? `
+          <div style="overflow-x:auto;">
+            <table>
+              <thead><tr>
+                <th>Guest</th><th>Wedding party</th><th>Status</th><th>Meal</th><th>Dietary</th>
+                <th>Plus-one</th><th>Plus-one meal</th><th>Song request</th><th>Note</th><th>Submitted</th>
+              </tr></thead>
+              <tbody>
+                ${rows.map(r => `<tr>
+                  <td>${r.guestName || ""}</td>
+                  <td>${r.isWeddingParty ? "Yes" : ""}</td>
+                  <td>${r.status || ""}</td>
+                  <td>${r.mealSelf || ""}</td>
+                  <td>${r.dietarySelf || ""}</td>
+                  <td>${r.plusOneName || ""}</td>
+                  <td>${r.mealPlusOne || ""}</td>
+                  <td>${r.songRequest || ""}</td>
+                  <td>${r.note || ""}</td>
+                  <td>${r.timestamp ? new Date(r.timestamp).toLocaleString() : ""}</td>
+                </tr>`).join("")}
+              </tbody>
+            </table>
+          </div>` : ""}
+        <div style="margin-top:24px;"><a href="#" id="back-link2" style="font-size:12px; opacity:0.6; color:var(--plum);">&larr; Back to guest login</a></div>
+      </div>`;
+    document.getElementById("refresh-btn").addEventListener("click", refreshAdminRows);
+    document.getElementById("export-btn").addEventListener("click", () => {
+      downloadCsv(rowsToCsv(state.adminRows || []), "jenny-max-rsvps.csv");
+    });
+    document.getElementById("back-link2").addEventListener("click", (e) => { e.preventDefault(); state.view = "login"; render(); });
+    return;
+  }
+
+  /* ---------- guest site ---------- */
+  const g = state.guest;
+  const showRehearsal = g.isWeddingParty && state.rsvp.status === "yes";
+  let tabHtml = "";
+
+  if (state.activeTab === "story") {
+    tabHtml = `<h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Our story</h2>
+      <p style="max-width:60ch; line-height:1.6;">We met on a foggy Tuesday in the Mission, waiting in the same too-long line for the same one good bakery. Six years, three apartments, and one very opinionated cat later, we're getting married a few miles from where we started — replace this with your real story.</p>`;
+  } else if (state.activeTab === "events") {
+    tabHtml = `<h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Events</h2>
+      ${PUBLIC_EVENTS.map(ev => eventCardHtml(ev, false)).join("")}
+      ${showRehearsal ? eventCardHtml(REHEARSAL_DINNER, true) : ""}
+      ${g.isWeddingParty && state.rsvp.status !== "yes" ? `<p style="font-size:13px; opacity:0.7; max-width:46ch;">Rehearsal dinner details will appear here once you RSVP yes.</p>` : ""}`;
+  } else if (state.activeTab === "rsvp") {
+    const r = state.rsvp;
+
+    if (state.rsvpSubmitted && !state.rsvpEditing) {
+      tabHtml = `
+        <h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">RSVP</h2>
+        <div style="max-width:440px;">
+          ${r.status === "yes" ? `<p style="color:var(--sangria); font-weight:700; font-size:19px;">You're on the list, ${g.name.split(" ")[0]}. See you there!</p>` : `<p style="opacity:0.75; font-size:17px;">We'll miss you, ${g.name.split(" ")[0]} — thank you for letting us know.</p>`}
+          ${showRehearsal ? `
+            <div style="margin-top:14px;">
+              <div style="font-size:13px; opacity:0.75; margin-bottom:8px;">Since you're part of the wedding party, here are the rehearsal dinner details:</div>
+              ${eventCardHtml(REHEARSAL_DINNER, true)}
+            </div>` : ""}
+          <button id="edit-rsvp-btn" class="btn secondary" style="margin-top:18px; font-size:13px; padding:8px 18px;">Change my RSVP</button>
+        </div>
+      `;
+    } else {
+      tabHtml = `
+        <h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">RSVP</h2>
+        <form id="rsvp-form" style="max-width:440px;">
+          <div style="margin-bottom:16px;">
+            <div style="margin-bottom:8px;">Will you be joining us?</div>
+            <label style="display:block; margin-bottom:6px; cursor:pointer;">
+              <input type="radio" name="rsvp-status" value="yes" ${r.status === "yes" ? "checked" : ""} style="margin-right:8px;" /> Joyfully accept
+            </label>
+            <label style="display:block; margin-bottom:6px; cursor:pointer;">
+              <input type="radio" name="rsvp-status" value="no" ${r.status === "no" ? "checked" : ""} style="margin-right:8px;" /> Regretfully decline
+            </label>
+          </div>
+          ${r.status === "yes" ? `
+            <div style="margin-bottom:14px;">
+              <label style="display:block; margin-bottom:6px;">Your meal choice</label>
+              <select id="meal-self" class="field">
+                <option value="">Select one</option>
+                <option value="chicken" ${r.mealSelf === "chicken" ? "selected" : ""}>Herb chicken</option>
+                <option value="fish" ${r.mealSelf === "fish" ? "selected" : ""}>Pan-seared fish</option>
+                <option value="veg" ${r.mealSelf === "veg" ? "selected" : ""}>Wild mushroom (vegetarian)</option>
+              </select>
+            </div>
+            <div style="margin-bottom:14px;">
+              <label style="display:block; margin-bottom:6px;">Dietary restrictions or allergies</label>
+              <input id="dietary-self" class="field" type="text" placeholder="e.g. nut allergy, gluten-free" value="${r.dietarySelf}" />
+            </div>
+            ${g.plusOneAllowed ? `
+              <div style="margin-bottom:14px;">
+                <label style="display:block; margin-bottom:6px;">Plus-one's name</label>
+                <input id="plus-one-name" class="field" type="text" placeholder="Who's coming with you?" value="${r.plusOneName}" />
+              </div>
+              <div style="margin-bottom:14px;">
+                <label style="display:block; margin-bottom:6px;">Plus-one's meal choice</label>
+                <select id="meal-plus-one" class="field">
+                  <option value="">Select one</option>
+                  <option value="chicken" ${r.mealPlusOne === "chicken" ? "selected" : ""}>Herb chicken</option>
+                  <option value="fish" ${r.mealPlusOne === "fish" ? "selected" : ""}>Pan-seared fish</option>
+                  <option value="veg" ${r.mealPlusOne === "veg" ? "selected" : ""}>Wild mushroom (vegetarian)</option>
+                </select>
+              </div>` : ""}
+            <div style="margin-bottom:14px;">
+              <label style="display:block; margin-bottom:6px;">Song request &#128266;</label>
+              <input id="song-request" class="field" type="text" placeholder="What'll get you on the dance floor?" value="${r.songRequest}" />
+            </div>
+            <div style="margin-bottom:14px;">
+              <label style="display:block; margin-bottom:6px;">Note for the couple (optional)</label>
+              <textarea id="note" class="field" rows="3" placeholder="Well wishes, questions, anything!">${r.note}</textarea>
+            </div>
+          ` : ""}
+          <button type="submit" class="btn" ${!r.status ? "disabled" : ""}>${state.rsvpSaving ? "Saving…" : "Send RSVP"}</button>
+        </form>
+      `;
+    }
+    `;
+  } else if (state.activeTab === "travel") {
+    tabHtml = `<h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Travel</h2>
+      <p style="max-width:55ch; line-height:1.6; margin-bottom:16px;">Fly into SFO or OAK. Both venues are a short rideshare from downtown; parking is limited at the Presidio, so carpooling or rideshare is easiest.</p>
+      ${eventCardHtml({ title: "Hotel block", date: "Mentions rate + deadline", time: "", location: "Hotel name, neighborhood", detail: "Add your negotiated room block details and booking link here." }, false)}`;
+  } else if (state.activeTab === "registry") {
+    tabHtml = `<h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Registry</h2>
+      <p style="max-width:55ch; line-height:1.6;">Your presence is the gift. If you'd like to give something, we've set up registries here — replace with real links when ready.</p>`;
+  } else if (state.activeTab === "faq") {
+    const faqs = [
+      { q: "What should I wear?", a: "Cocktail attire. The ceremony is outdoors and can be breezy — bring a layer." },
+      { q: "Are kids welcome?", a: "We love your little ones, but this will be an adults-only celebration." },
+      { q: "Is there parking?", a: "Street parking near the Presidio is limited — rideshare is strongly recommended." },
+    ];
+    tabHtml = `<h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">FAQ</h2>
+      ${faqs.map(f => `<div style="margin-bottom:16px; max-width:55ch;">
+        <div style="font-weight:700; margin-bottom:4px;">${f.q}</div>
+        <div style="font-size:14px; opacity:0.8; line-height:1.5;">${f.a}</div>
+      </div>`).join("")}`;
+  }
+
+  app.innerHTML = `
+    <div class="border-row top">${squiggleSvg()}</div>
+    <header style="padding:26px 32px 0;">
+      <div style="max-width:900px; margin:0 auto;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div class="display" style="font-size:22px; color:var(--sangria);">Jenny &amp; Max</div>
+          <button id="logout-btn" class="btn secondary" style="padding:6px 16px; font-size:13px;">Log out</button>
+        </div>
+        <div style="font-size:12px; opacity:0.65; margin:2px 0 14px;">Hi ${g.name.split(" ")[0]} &middot; October 3, 2026, San Francisco</div>
+        <div style="display:flex; flex-wrap:wrap;">
+          ${TABS.map(t => `<button class="tab-btn ${state.activeTab === t.id ? "active" : ""}" data-tab="${t.id}">${t.label}</button>`).join("")}
+        </div>
+      </div>
+    </header>
+    <main style="max-width:900px; margin:0 auto; padding:32px 32px 70px;">${tabHtml}</main>
+  `;
+
+  document.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => { state.activeTab = btn.dataset.tab; render(); });
+  });
+
+  const logoutBtn = document.getElementById("logout-btn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+      state.view = "login";
+      state.guest = null;
+      state.activeTab = "events";
+      state.rsvp = { status: null, mealSelf: "", dietarySelf: "", plusOneName: "", mealPlusOne: "", songRequest: "", note: "" };
+      state.rsvpSubmitted = false;
+      state.rsvpEditing = false;
+      state.loginError = "";
+      render();
+    });
+  }
+
+  const editRsvpBtn = document.getElementById("edit-rsvp-btn");
+  if (editRsvpBtn) {
+    editRsvpBtn.addEventListener("click", () => {
+      state.rsvpEditing = true;
+      render();
+    });
+  }
+
+  const rsvpForm = document.getElementById("rsvp-form");
+  if (rsvpForm) {
+    rsvpForm.querySelectorAll('input[name="rsvp-status"]').forEach(radio => {
+      radio.addEventListener("change", (e) => {
+        state.rsvp.status = e.target.value;
+        state.rsvpSubmitted = false;
+        render();
+      });
+    });
+    const bind = (id, key) => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener("input", (e) => { state.rsvp[key] = e.target.value; });
+    };
+    bind("meal-self", "mealSelf");
+    bind("dietary-self", "dietarySelf");
+    bind("plus-one-name", "plusOneName");
+    bind("meal-plus-one", "mealPlusOne");
+    bind("song-request", "songRequest");
+    bind("note", "note");
+    const mealSelfEl = document.getElementById("meal-self");
+    if (mealSelfEl) mealSelfEl.addEventListener("change", (e) => { state.rsvp.mealSelf = e.target.value; });
+    const mealPlusOneEl = document.getElementById("meal-plus-one");
+    if (mealPlusOneEl) mealPlusOneEl.addEventListener("change", (e) => { state.rsvp.mealPlusOne = e.target.value; });
+
+    rsvpForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      state.rsvpSaving = true;
+      render();
+      try {
+        await saveRsvp(g, state.rsvp);
+        state.rsvpSubmitted = true;
+        state.rsvpEditing = false;
+      } catch (err) {
+        state.rsvpSubmitted = false;
+      }
+      state.rsvpSaving = false;
+      render();
+    });
+  }
+}
+
+async function refreshAdminRows() {
+  state.adminLoading = true;
+  render();
+  try {
+    state.adminRows = await loadAllRsvps(state.adminPasscode);
+  } catch (e) {
+    state.adminRows = [];
+  }
+  state.adminLoading = false;
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
