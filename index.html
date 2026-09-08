@@ -14,6 +14,7 @@
     --cream: #FBF3E7;
     --sangria: #B5324A;
     --plum: #3D2621;
+    --forest: #355E3B;
   }
   * { box-sizing: border-box; }
   body {
@@ -273,7 +274,7 @@ function circleChoice(name, value, label, checked) {
     <input type="radio" name="${name}" value="${value}" ${checked ? "checked" : ""} />
     <span>${label}</span>
     ${checked ? `<svg viewBox="0 0 120 50" preserveAspectRatio="none">
-      <path d="M6,26 C3.7,10 29.2,4 60.6,5 C96.6,6 116.3,14 114,26 C111.7,39 85,45 55.9,44 C23.4,43 0.2,36 4.8,23" fill="none" stroke="var(--sangria)" stroke-width="4" stroke-linecap="round"/>
+      <path d="M6,26 C3.7,10 29.2,4 60.6,5 C96.6,6 116.3,14 114,26 C111.7,39 85,45 55.9,44 C23.4,43 0.2,36 4.8,23" fill="none" stroke="var(--forest)" stroke-width="4" stroke-linecap="round"/>
     </svg>` : ""}
   </label>`;
 }
