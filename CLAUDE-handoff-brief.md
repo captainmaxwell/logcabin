@@ -22,7 +22,7 @@ no build step. It currently has:
   confirmation view instead of leaving the form visible, with a
   "Change my RSVP" button to re-open it for edits
 - Admin dashboard (passcode-gated) showing all RSVP responses + CSV export
-- A companion Apps Script (`AppsScript-Code.gs`) that is the actual backend
+- A companion Apps Script (`apps-script/Code.gs`) that is the actual backend
 
 **This has not yet been moved into a real repo, git history, or hosting.**
 That's the next step this brief is meant to support.
@@ -84,7 +84,7 @@ it requires no new accounts/services and keeps everything in a tool the
 couple already uses. **It is an intentional stepping stone, not the final
 architecture** — see "Known limitations" below.
 
-The Apps Script (`AppsScript-Code.gs`) is deployed as a Web App
+The Apps Script (`apps-script/Code.gs`) is deployed as a Web App
 (`Execute as: Me`, `Who has access: Anyone`) and exposes:
 
 - `doPost(e)` — appends a new row to the RSVPs tab from JSON in the request
