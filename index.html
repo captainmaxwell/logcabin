@@ -34,8 +34,9 @@
     border-radius: 14px; background: white; color: var(--plum);
   }
   .btn {
-    border: 2.5px solid var(--plum); background: var(--sangria); color: var(--cream);
+    border: none; background: var(--sangria); color: var(--cream);
     font-weight: 700; padding: 10px 22px; border-radius: 999px; cursor: pointer;
+    box-shadow: 0 1px 4px rgba(61,38,33,0.2);
   }
   .btn.secondary { background: white; color: var(--plum); }
   .btn:disabled { opacity: 0.4; cursor: not-allowed; }
@@ -49,10 +50,11 @@
     background: var(--cream); padding: 8px 0; border-bottom: 2px solid var(--plum);
   }
   .card {
-    border: 2.5px solid var(--plum); border-radius: 16px; padding: 18px 22px;
+    border: none; border-radius: 16px; padding: 18px 22px;
     margin-bottom: 14px; max-width: 520px; background: white;
+    box-shadow: 0 1px 6px rgba(61,38,33,0.12);
   }
-  .card.rehearsal { border-color: var(--sangria); }
+  .card.rehearsal { background: #fdf0f3; }
   .cards-grid {
     display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 16px; max-width: 900px; align-items: start;
