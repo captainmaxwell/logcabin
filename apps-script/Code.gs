@@ -4,6 +4,19 @@
 
 var ADMIN_PASSCODE = 'partyon2026'; // change this to something only you two know
 
+// Normalizes a name for matching: strips accents (José -> jose), normalizes
+// curly quotes to straight ones (O'Brien either way), collapses any run of
+// whitespace to a single space, trims, and lowercases. Applied to BOTH sides
+// of every name comparison in this script (and mirrored in index.html) so a
+// stray space or missing accent on either side of the match doesn't matter.
+function normalizeName(name) {
+  return String(name || '')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[\u2018\u2019\u02bc]/g, "'")
+    .trim().replace(/\s+/g, ' ')
+    .toLowerCase();
+}
+
 function doPost(e) {
   var data = JSON.parse(e.postData.contents);
 
@@ -44,10 +57,10 @@ function doPost(e) {
 // Case-insensitive, trimmed match against the Guests tab — same rule as
 // login, so a POST can only ever create/update a row for a real invitee.
 function isInvitedGuest(guestName) {
-  var name = (guestName || '').trim().toLowerCase();
+  var name = normalizeName(guestName);
   if (!name) return false;
   return getGuestRows().some(function (g) {
-    return String(g.name || '').trim().toLowerCase() === name;
+    return normalizeName(g.name) === name;
   });
 }
 
@@ -56,10 +69,10 @@ function isInvitedGuest(guestName) {
 // case-insensitive, trimmed — since "knowing a name" is the whole access
 // model here.
 function findRsvpRowByName(sheet, guestName) {
-  var name = (guestName || '').trim().toLowerCase();
+  var name = normalizeName(guestName);
   var values = sheet.getDataRange().getValues();
   for (var i = 1; i < values.length; i++) { // skip header row
-    if (String(values[i][1] || '').trim().toLowerCase() === name) {
+    if (normalizeName(values[i][1]) === name) {
       return i + 1; // 1-indexed sheet row
     }
   }
@@ -74,14 +87,14 @@ function doGet(e) {
   }
 
   if (action === 'myrsvp') {
-    var name = (e.parameter.name || '').trim().toLowerCase();
+    var name = normalizeName(e.parameter.name);
     var rows = getRsvpRows();
     // doPost now updates in place, so there should only ever be one row per
     // guest — but search from the end anyway as a safety net against any
     // leftover duplicate rows from before this change.
     var match = null;
     for (var i = rows.length - 1; i >= 0; i--) {
-      if (String(rows[i].guestName || '').trim().toLowerCase() === name) {
+      if (normalizeName(rows[i].guestName) === name) {
         match = rows[i];
         break;
       }
