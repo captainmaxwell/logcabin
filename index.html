@@ -79,24 +79,6 @@ function squiggleSvg() {
       fill="none" stroke="#B5324A" stroke-width="4" stroke-linecap="round"/>
   </svg>`;
 }
-function bridgeSvg() {
-  return `<svg viewBox="0 0 200 90" style="width:150px; display:block; margin:10px auto;">
-    <line x1="0" y1="70" x2="200" y2="70" stroke="#B5324A" stroke-width="4" stroke-linecap="round"/>
-    <line x1="55" y1="12" x2="50" y2="70" stroke="#B5324A" stroke-width="4" stroke-linecap="round"/>
-    <line x1="145" y1="12" x2="150" y2="70" stroke="#B5324A" stroke-width="4" stroke-linecap="round"/>
-    <line x1="45" y1="12" x2="65" y2="12" stroke="#B5324A" stroke-width="4" stroke-linecap="round"/>
-    <line x1="135" y1="12" x2="155" y2="12" stroke="#B5324A" stroke-width="4" stroke-linecap="round"/>
-    <path d="M2 68 Q 52 15, 100 45 T 198 68" fill="none" stroke="#B5324A" stroke-width="3" stroke-linecap="round"/>
-    <line x1="20" y1="55" x2="20" y2="69" stroke="#B5324A" stroke-width="2"/>
-    <line x1="35" y1="35" x2="35" y2="69" stroke="#B5324A" stroke-width="2"/>
-    <line x1="65" y1="20" x2="65" y2="69" stroke="#B5324A" stroke-width="2"/>
-    <line x1="80" y1="30" x2="80" y2="69" stroke="#B5324A" stroke-width="2"/>
-    <line x1="120" y1="30" x2="120" y2="69" stroke="#B5324A" stroke-width="2"/>
-    <line x1="135" y1="20" x2="135" y2="69" stroke="#B5324A" stroke-width="2"/>
-    <line x1="165" y1="35" x2="165" y2="69" stroke="#B5324A" stroke-width="2"/>
-    <line x1="180" y1="55" x2="180" y2="69" stroke="#B5324A" stroke-width="2"/>
-  </svg>`;
-}
 
 /* ---------- backend config ---------- */
 const CONFIG = {
@@ -240,8 +222,6 @@ function render() {
           <div style="display:inline-block; border:2.5px solid var(--sangria); color:var(--sangria); padding:6px 20px; border-radius:999px; font-size:12px; font-weight:700; letter-spacing:0.08em; margin-bottom:22px;">YOU'RE INVITED</div>
           <h1 class="display" style="font-size:60px; color:var(--sangria);">Jenny &amp; Max</h1>
           <img class="photo-circle" src="photos/jenny-max-square.jpg" alt="Jenny and Max" />
-          ${bridgeSvg()}
-          <div class="display" style="font-size:21px; margin:10px 0 10px;">are tying the knot!</div>
           <div class="countdown">${daysUntilWedding()} days to go</div>
           <div style="font-size:14px; opacity:0.75; margin-bottom:26px;">May 1, 2027 &middot; San Francisco, CA</div>
           <form id="login-form">
