@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Jenny & Max</title>
+<title>Jenny &amp; Max</title>
+<meta name="description" content="Jenny &amp; Max are getting married May 1, 2027 in San Francisco. RSVP and find event details here." />
+<meta property="og:title" content="Jenny &amp; Max" />
+<meta property="og:description" content="Jenny &amp; Max are getting married May 1, 2027 in San Francisco. RSVP and find event details here." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
@@ -234,7 +237,7 @@ function render() {
         <div style="flex:1; display:flex; align-items:center; justify-content:center; padding:24px;">
           <div style="text-align:center; max-width:400px; width:100%;">
             <div style="display:inline-block; border:2.5px solid var(--sangria); color:var(--sangria); padding:6px 20px; border-radius:999px; font-size:12px; font-weight:700; letter-spacing:0.08em; margin-bottom:22px;">YOU'RE INVITED</div>
-            <h1 class="display" style="font-size:60px; color:var(--sangria);">Jenny &amp; Max</h1>
+            <h1 class="display" style="font-size:clamp(38px, 12vw, 60px); color:var(--sangria);">Jenny &amp; Max</h1>
             <img class="photo-circle" src="photos/jenny-max-square.jpg" alt="Jenny and Max" />
             <div class="countdown">${daysUntilWedding()} days to go</div>
             <div style="font-size:14px; opacity:0.75; margin-bottom:26px;">May 1, 2027 &middot; San Francisco, CA</div>
