@@ -69,9 +69,7 @@
     flex: 1 1 280px; max-width: 340px; width: 100%; border-radius: 16px;
     border: 2.5px solid var(--plum); object-fit: cover; max-height: 420px;
   }
-  .mascot { position: absolute; bottom: 0; width: 64px; opacity: 0.9; pointer-events: none; }
-  .mascot.left { left: 14px; transform: rotate(-6deg); }
-  .mascot.right { right: 14px; transform: rotate(6deg); }
+  .mascot-inline { width: 40px; opacity: 0.9; }
   .venue-photo {
     width: 100%; max-width: 500px; border-radius: 16px;
     border: 2.5px solid var(--plum); display: block; margin-bottom: 16px;
@@ -231,9 +229,7 @@ function render() {
 
   if (state.view === "login") {
     app.innerHTML = `
-      <div style="min-height:100vh; display:flex; flex-direction:column; position:relative;">
-        <img class="mascot left" src="photos/lav.png" alt="Lav" />
-        <img class="mascot right" src="photos/lenny.png" alt="Lenny" />
+      <div style="min-height:100vh; display:flex; flex-direction:column;">
         <div class="border-row top">${squiggleSvg()}</div>
         <div style="flex:1; display:flex; align-items:center; justify-content:center; padding:24px;">
           <div style="text-align:center; max-width:400px; width:100%;">
@@ -248,7 +244,11 @@ function render() {
               <button type="submit" class="btn" style="width:100%;">Let's go &rarr;</button>
             </form>
             <div style="font-size:12px; opacity:0.55; margin-top:16px;">Enter your name exactly as it appears on your invitation</div>
-            <div style="margin-top:26px;">
+            <div style="display:flex; justify-content:center; gap:20px; margin-top:18px;">
+              <img class="mascot-inline" src="photos/lav.png" alt="Lav" />
+              <img class="mascot-inline" src="photos/lenny.png" alt="Lenny" />
+            </div>
+            <div style="margin-top:14px;">
               <a href="#" id="admin-link" style="font-size:12px; opacity:0.5; color:var(--plum);">Wedding admin</a>
             </div>
           </div>
