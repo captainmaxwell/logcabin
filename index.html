@@ -21,9 +21,8 @@
     font-weight: 400;
   }
   .display { font-weight: 700; }
-  .border-row { position: fixed; left: 0; width: 100%; z-index: 1; pointer-events: none; }
-  .border-row.top { top: 10px; }
-  .border-row.bottom { bottom: 10px; transform: scaleY(-1); }
+  .border-row { width: 100%; pointer-events: none; margin: 10px 0; }
+  .border-row.bottom { transform: scaleY(-1); }
   .squiggle-strip { display:block; }
   h1, h2 { font-weight: 700; margin: 0; }
   input, select, textarea, button { font-family: 'Kalam', cursive; font-size: 15px; }
@@ -215,25 +214,27 @@ function render() {
 
   if (state.view === "login") {
     app.innerHTML = `
-      <div class="border-row top">${squiggleSvg()}</div>
-      <div class="border-row bottom">${squiggleSvg()}</div>
-      <div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;">
-        <div style="text-align:center; max-width:400px; width:100%;">
-          <div style="display:inline-block; border:2.5px solid var(--sangria); color:var(--sangria); padding:6px 20px; border-radius:999px; font-size:12px; font-weight:700; letter-spacing:0.08em; margin-bottom:22px;">YOU'RE INVITED</div>
-          <h1 class="display" style="font-size:60px; color:var(--sangria);">Jenny &amp; Max</h1>
-          <img class="photo-circle" src="photos/jenny-max-square.jpg" alt="Jenny and Max" />
-          <div class="countdown">${daysUntilWedding()} days to go</div>
-          <div style="font-size:14px; opacity:0.75; margin-bottom:26px;">May 1, 2027 &middot; San Francisco, CA</div>
-          <form id="login-form">
-            <input id="login-name" class="field" type="text" placeholder="Enter your full name" style="text-align:center; margin-bottom:12px;" autocomplete="off" />
-            ${state.loginError ? `<div style="color:var(--sangria); font-size:13px; margin-bottom:12px;">${state.loginError}</div>` : ""}
-            <button type="submit" class="btn" style="width:100%;">Let's go &rarr;</button>
-          </form>
-          <div style="font-size:12px; opacity:0.55; margin-top:16px;">Enter your name exactly as it appears on your invitation</div>
-          <div style="margin-top:26px;">
-            <a href="#" id="admin-link" style="font-size:12px; opacity:0.5; color:var(--plum);">Wedding admin</a>
+      <div style="min-height:100vh; display:flex; flex-direction:column;">
+        <div class="border-row top">${squiggleSvg()}</div>
+        <div style="flex:1; display:flex; align-items:center; justify-content:center; padding:24px;">
+          <div style="text-align:center; max-width:400px; width:100%;">
+            <div style="display:inline-block; border:2.5px solid var(--sangria); color:var(--sangria); padding:6px 20px; border-radius:999px; font-size:12px; font-weight:700; letter-spacing:0.08em; margin-bottom:22px;">YOU'RE INVITED</div>
+            <h1 class="display" style="font-size:60px; color:var(--sangria);">Jenny &amp; Max</h1>
+            <img class="photo-circle" src="photos/jenny-max-square.jpg" alt="Jenny and Max" />
+            <div class="countdown">${daysUntilWedding()} days to go</div>
+            <div style="font-size:14px; opacity:0.75; margin-bottom:26px;">May 1, 2027 &middot; San Francisco, CA</div>
+            <form id="login-form">
+              <input id="login-name" class="field" type="text" placeholder="Enter your full name" style="text-align:center; margin-bottom:12px;" autocomplete="off" />
+              ${state.loginError ? `<div style="color:var(--sangria); font-size:13px; margin-bottom:12px;">${state.loginError}</div>` : ""}
+              <button type="submit" class="btn" style="width:100%;">Let's go &rarr;</button>
+            </form>
+            <div style="font-size:12px; opacity:0.55; margin-top:16px;">Enter your name exactly as it appears on your invitation</div>
+            <div style="margin-top:26px;">
+              <a href="#" id="admin-link" style="font-size:12px; opacity:0.5; color:var(--plum);">Wedding admin</a>
+            </div>
           </div>
         </div>
+        <div class="border-row bottom">${squiggleSvg()}</div>
       </div>`;
     document.getElementById("login-form").addEventListener("submit", async (e) => {
       e.preventDefault();
