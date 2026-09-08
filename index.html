@@ -112,6 +112,10 @@ async function fetchGuests() {
 const WEDDING_DATE_ISO = "2027-05-01T00:00:00";
 const RSVP_DEADLINE = "Saturday, April 3, 2027"; // 4 weeks before the wedding — standard lead time for a final headcount
 
+// Flip to false once full details (registry, attire, brunch logistics) are
+// ready to share. Nothing behind this flag is deleted — just hidden.
+const SAVE_THE_DATE_MODE = true;
+
 function daysUntilWedding() {
   const diff = new Date(WEDDING_DATE_ISO) - new Date();
   return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
@@ -124,7 +128,9 @@ const ZAZIE_MAP_HTML = `<br><a href="${ZAZIE_MAP_LINK}" target="_blank" rel="noo
 
 const PUBLIC_EVENTS = [
   { id: "ceremony-reception", title: "Ceremony &amp; Reception", date: "Saturday, May 1, 2027", time: "4:00 PM &ndash; 10:00 PM", location: "The Log Cabin, Presidio", detail: `An outdoor ceremony under the eucalyptus, fog permitting, followed by dinner, toasts, and dancing at the Log Cabin, with the Golden Gate Bridge as our backdrop. Seating starts at 3:30.${VENUE_MAP_HTML}` },
-  { id: "brunch", title: "Farewell Brunch", date: "Sunday, May 2, 2027", time: "10:00 AM", location: "Zazie", detail: `One more meal together before everyone heads home — hope you can join us!${ZAZIE_MAP_HTML}` },
+  SAVE_THE_DATE_MODE
+    ? { id: "brunch", title: "Farewell Brunch", date: "Sunday, May 2, 2027", time: "Time TBD", location: "Location TBD", detail: "One more meal together before everyone heads home — details coming soon!" }
+    : { id: "brunch", title: "Farewell Brunch", date: "Sunday, May 2, 2027", time: "10:00 AM", location: "Zazie", detail: `One more meal together before everyone heads home — hope you can join us!${ZAZIE_MAP_HTML}` },
 ];
 const REHEARSAL_DINNER = { title: "Rehearsal Dinner", date: "Friday, April 30, 2027", time: "7:00 PM", location: "Liholiho Yacht Club", detail: "Wedding party and partners. Casual dress, no speeches — we promise." };
 
@@ -154,7 +160,7 @@ const state = {
   adminPasscode: "",    // kept only so "Refresh" can re-authenticate
 };
 
-const TABS = [
+const ALL_TABS = [
   { id: "story", label: "Our story" },
   { id: "events", label: "Events" },
   { id: "rsvp", label: "RSVP" },
@@ -162,6 +168,10 @@ const TABS = [
   { id: "registry", label: "Registry" },
   { id: "faq", label: "FAQ" },
 ];
+// Registry isn't deleted, just hidden from the nav while save-the-date mode
+// is on — the tab's own render logic further down is untouched, so flipping
+// SAVE_THE_DATE_MODE to false brings it straight back.
+const TABS = SAVE_THE_DATE_MODE ? ALL_TABS.filter(t => t.id !== "registry") : ALL_TABS;
 
 function eventCardHtml(ev, rehearsal) {
   const meta = [ev.date, ev.time, ev.location].filter(Boolean).join(" &middot; ");
@@ -502,7 +512,9 @@ function render() {
       <p style="max-width:55ch; line-height:1.6;">Your presence is the gift. If you'd like to give something, we've set up registries here — replace with real links when ready.</p>`;
   } else if (state.activeTab === "faq") {
     const faqs = [
-      { q: "What should I wear?", a: "Cocktail attire. The ceremony is outdoors and can be breezy — bring a layer." },
+      SAVE_THE_DATE_MODE
+        ? { q: "What should I wear?", a: "Details coming soon — check back closer to the date!" }
+        : { q: "What should I wear?", a: "Cocktail attire. The ceremony is outdoors and can be breezy — bring a layer." },
       { q: "Are kids welcome?", a: "We love your little ones, but this will be an adults-only celebration." },
       { q: "Is there parking?", a: "Street parking near the Presidio is limited — rideshare is strongly recommended." },
     ];
@@ -515,14 +527,12 @@ function render() {
 
   app.innerHTML = `
     <div class="border-row top">${squiggleSvg()}</div>
-    <header style="padding:26px 32px 0;">
-      <div style="max-width:900px; margin:0 auto;">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-          <div class="display" style="font-size:22px; color:var(--sangria);">Jenny &amp; Max</div>
-          <button id="logout-btn" class="btn secondary" style="padding:6px 16px; font-size:13px;">Log out</button>
-        </div>
-        <div style="font-size:12px; opacity:0.65; margin:10px 0 14px;">Hi ${g.name.split(" ")[0]} &middot; May 1, 2027, San Francisco &middot; ${daysUntilWedding()} days to go</div>
+    <header style="max-width:900px; margin:0 auto; padding:26px 32px 0;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div class="display" style="font-size:22px; color:var(--sangria);">Jenny &amp; Max</div>
+        <button id="logout-btn" class="btn secondary" style="padding:6px 16px; font-size:13px;">Log out</button>
       </div>
+      <div style="font-size:12px; opacity:0.65; margin:10px 0 14px;">Hi ${g.name.split(" ")[0]} &middot; May 1, 2027, San Francisco &middot; ${daysUntilWedding()} days to go</div>
     </header>
     <main style="max-width:900px; margin:0 auto; padding:0 32px 70px;">
       <div class="tab-nav">
