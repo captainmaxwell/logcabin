@@ -6,6 +6,13 @@ var ADMIN_PASSCODE = 'partyon2026'; // change this to something only you two kno
 
 function doPost(e) {
   var data = JSON.parse(e.postData.contents);
+
+  // Reject RSVPs for names that aren't actually on the guest list, so a
+  // stray or malicious POST can't inject fake rows into the RSVPs tab.
+  if (!isInvitedGuest(data.guestName)) {
+    return jsonOut({ error: 'unknown guest' });
+  }
+
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('RSVPs');
   var now = new Date();
   var guestCols = [
@@ -32,6 +39,16 @@ function doPost(e) {
   }
   return ContentService.createTextOutput(JSON.stringify({ ok: true }))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+// Case-insensitive, trimmed match against the Guests tab — same rule as
+// login, so a POST can only ever create/update a row for a real invitee.
+function isInvitedGuest(guestName) {
+  var name = (guestName || '').trim().toLowerCase();
+  if (!name) return false;
+  return getGuestRows().some(function (g) {
+    return String(g.name || '').trim().toLowerCase() === name;
+  });
 }
 
 // Returns the 1-indexed sheet row for an existing guest's RSVP, or null if
