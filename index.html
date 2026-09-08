@@ -108,6 +108,7 @@ async function fetchGuests() {
 }
 
 const WEDDING_DATE_ISO = "2027-05-01T00:00:00";
+const RSVP_DEADLINE = "Saturday, April 3, 2027"; // 4 weeks before the wedding — standard lead time for a final headcount
 
 function daysUntilWedding() {
   const diff = new Date(WEDDING_DATE_ISO) - new Date();
@@ -413,7 +414,8 @@ function render() {
 
     if (state.rsvpSubmitted && !state.rsvpEditing) {
       tabHtml = `
-        <h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">RSVP</h2>
+        <h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:4px;">RSVP</h2>
+        <div style="font-size:13px; opacity:0.65; margin-bottom:14px;">Please RSVP by ${RSVP_DEADLINE}</div>
         <div style="max-width:440px;">
           ${r.status === "yes" ? `<p style="color:var(--sangria); font-weight:700; font-size:19px;">You're on the list, ${g.name.split(" ")[0]}. See you there!</p>` : `<p style="opacity:0.75; font-size:17px;">We'll miss you, ${g.name.split(" ")[0]} — thank you for letting us know.</p>`}
           ${showRehearsal ? `
@@ -426,7 +428,8 @@ function render() {
       `;
     } else {
       tabHtml = `
-        <h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">RSVP</h2>
+        <h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:4px;">RSVP</h2>
+        <div style="font-size:13px; opacity:0.65; margin-bottom:14px;">Please RSVP by ${RSVP_DEADLINE}</div>
         <form id="rsvp-form" style="max-width:440px;">
           <div style="margin-bottom:16px;">
             <div style="margin-bottom:8px;">Will you be joining us?</div>
