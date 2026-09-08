@@ -167,7 +167,7 @@ const state = {
   view: "login",         // login | site | admin-login | admin
   guest: null,
   activeTab: "events",
-  rsvp: { status: null, mealSelf: "", dietarySelf: "", plusOneName: "", mealPlusOne: "", songRequest: "", note: "" },
+  rsvp: { status: null, mealSelf: "", dietarySelf: "", songRequest: "", note: "", plusOnes: [] },
   rsvpSubmitted: false,
   rsvpEditing: false,
   rsvpSaving: false,
@@ -202,16 +202,16 @@ function eventCardHtml(ev, rehearsal) {
 
 /* ---------- backend calls (Apps Script Web App) ---------- */
 async function saveRsvp(guest, rsvp) {
+  // isWeddingParty isn't sent — the server derives it itself from the
+  // Guests tab rather than trusting a client-supplied value.
   const record = {
     guestName: guest.name,
-    isWeddingParty: guest.isWeddingParty,
     status: rsvp.status,
     mealSelf: rsvp.mealSelf,
     dietarySelf: rsvp.dietarySelf,
-    plusOneName: rsvp.plusOneName,
-    mealPlusOne: rsvp.mealPlusOne,
     songRequest: rsvp.songRequest,
     note: rsvp.note,
+    plusOnes: (rsvp.plusOnes || []).map(p => ({ name: p.name, status: p.status, meal: p.meal, dietary: p.dietary })),
   };
   // Sent as a plain-text body (not application/json) so the browser doesn't
   // send a CORS preflight OPTIONS request, which Apps Script doesn't handle.
@@ -223,9 +223,9 @@ async function loadRsvp(guest) {
     const url = `${CONFIG.RSVP_API_URL}?action=myrsvp&name=${encodeURIComponent(guest.name)}`;
     const res = await fetch(url);
     const data = await res.json();
-    return data.row || null;
+    return { row: data.row || null, plusOnes: data.plusOnes || [] };
   } catch (e) {
-    return null;
+    return { row: null, plusOnes: [] };
   }
 }
 async function loadAllRsvps(passcode) {
@@ -247,7 +247,7 @@ function escapeHtml(str) {
   }[c]));
 }
 function rowsToCsv(rows) {
-  const cols = ["guestName","isWeddingParty","status","mealSelf","dietarySelf","plusOneName","mealPlusOne","songRequest","note","timestamp","lastUpdated","modified"];
+  const cols = ["name","linkedTo","isWeddingParty","status","meal","dietary","songRequest","note","timestamp","lastUpdated","modified"];
   const esc = (v) => {
     const s = (v === undefined || v === null) ? "" : String(v);
     return '"' + s.replace(/"/g, '""') + '"';
@@ -318,15 +318,24 @@ function render() {
       state.loginError = "";
       state.guest = g;
       state.rsvpEditing = false;
-      const existing = await loadRsvp(g);
-      if (existing) {
-        state.rsvp = {
-          status: existing.status, mealSelf: existing.mealSelf || "", dietarySelf: existing.dietarySelf || "",
-          plusOneName: existing.plusOneName || "", mealPlusOne: existing.mealPlusOne || "",
-          songRequest: existing.songRequest || "", note: existing.note || "",
-        };
-        state.rsvpSubmitted = true;
-      }
+      const loaded = await loadRsvp(g);
+      const savedPlusOnesByName = {};
+      loaded.plusOnes.forEach(p => { savedPlusOnesByName[normalizeName(p.name)] = p; });
+      // g.plusOnes is the authoritative list of who's actually linked to this
+      // invitee in the Guests tab; any saved answers just overlay onto it, so
+      // a plus-one added to the sheet after a prior submission still shows up.
+      state.rsvp = {
+        status: loaded.row ? loaded.row.status : null,
+        mealSelf: loaded.row ? (loaded.row.meal || "") : "",
+        dietarySelf: loaded.row ? (loaded.row.dietary || "") : "",
+        songRequest: loaded.row ? (loaded.row.songRequest || "") : "",
+        note: loaded.row ? (loaded.row.note || "") : "",
+        plusOnes: (g.plusOnes || []).map(p => {
+          const saved = savedPlusOnesByName[normalizeName(p.name)];
+          return { name: p.name, status: saved ? saved.status : null, meal: saved ? (saved.meal || "") : "", dietary: saved ? (saved.dietary || "") : "" };
+        }),
+      };
+      state.rsvpSubmitted = !!loaded.row;
       state.view = "site";
       render();
     });
@@ -394,20 +403,19 @@ function render() {
           <div style="overflow-x:auto;">
             <table>
               <thead><tr>
-                <th>Guest</th><th>Wedding party</th><th>Status</th><th>Meal</th><th>Dietary</th>
-                <th>Plus-one</th><th>Plus-one meal</th><th>Song request</th><th>Note</th><th>Submitted</th><th>Last updated</th>
+                <th>Guest</th><th>Plus-one of</th><th>Wedding party</th><th>Status</th><th>Meal</th><th>Dietary</th>
+                <th>Song request</th><th>Note</th><th>Submitted</th><th>Last updated</th>
               </tr></thead>
               <tbody>
                 ${rows.map(r => {
                   const isModified = r.modified === true || String(r.modified).toUpperCase() === "TRUE";
                   return `<tr${isModified ? ' style="background: #fdf0f3;"' : ''}>
-                  <td>${escapeHtml(r.guestName)}</td>
+                  <td>${escapeHtml(r.name)}</td>
+                  <td>${escapeHtml(r.linkedTo)}</td>
                   <td>${r.isWeddingParty ? "Yes" : ""}</td>
                   <td>${escapeHtml(r.status)}</td>
-                  <td>${escapeHtml(r.mealSelf)}</td>
-                  <td>${escapeHtml(r.dietarySelf)}</td>
-                  <td>${escapeHtml(r.plusOneName)}</td>
-                  <td>${escapeHtml(r.mealPlusOne)}</td>
+                  <td>${escapeHtml(r.meal)}</td>
+                  <td>${escapeHtml(r.dietary)}</td>
                   <td>${escapeHtml(r.songRequest)}</td>
                   <td>${escapeHtml(r.note)}</td>
                   <td>${r.timestamp ? new Date(r.timestamp).toLocaleString() : ""}</td>
@@ -456,6 +464,14 @@ function render() {
         <div style="font-size:13px; opacity:0.65; margin-bottom:14px;">Please RSVP by ${RSVP_DEADLINE}</div>
         <div style="max-width:440px;">
           ${r.status === "yes" ? `<p style="color:var(--sangria); font-weight:700; font-size:19px;">You're on the list, ${g.name.split(" ")[0]}. See you there!</p>` : `<p style="opacity:0.75; font-size:17px;">We'll miss you, ${g.name.split(" ")[0]} — thank you for letting us know.</p>`}
+          ${r.status === "yes" && r.plusOnes.length > 0 ? `
+            <ul style="list-style:none; padding:0; margin:0 0 14px;">
+              ${r.plusOnes.map(p => `<li style="font-size:14px; margin-bottom:4px;">
+                ${p.status === "yes" ? `<span style="color:var(--sangria); font-weight:700;">${escapeHtml(p.name)} is coming too.</span>`
+                  : p.status === "no" ? `<span style="opacity:0.7;">${escapeHtml(p.name)} won't be able to make it.</span>`
+                  : `<span style="opacity:0.7;">Haven't heard back yet on ${escapeHtml(p.name)} — edit your RSVP to let us know.</span>`}
+              </li>`).join("")}
+            </ul>` : ""}
           ${showRehearsal ? `
             <div style="margin-top:14px;">
               <div style="font-size:13px; opacity:0.75; margin-bottom:8px;">Since you're part of the wedding party, here are the rehearsal dinner details:</div>
@@ -492,20 +508,31 @@ function render() {
               <label style="display:block; margin-bottom:6px;">Dietary restrictions or allergies</label>
               <input id="dietary-self" class="field" type="text" placeholder="e.g. nut allergy, gluten-free" value="${escapeHtml(r.dietarySelf)}" />
             </div>
-            ${g.plusOneAllowed ? `
-              <div style="margin-bottom:14px;">
-                <label style="display:block; margin-bottom:6px;">Plus-one's name</label>
-                <input id="plus-one-name" class="field" type="text" placeholder="Who's coming with you?" value="${escapeHtml(r.plusOneName)}" />
-              </div>
-              <div style="margin-bottom:14px;">
-                <label style="display:block; margin-bottom:6px;">Plus-one's meal choice</label>
-                <select id="meal-plus-one" class="field">
-                  <option value="">Select one</option>
-                  <option value="chicken" ${r.mealPlusOne === "chicken" ? "selected" : ""}>Herb chicken</option>
-                  <option value="fish" ${r.mealPlusOne === "fish" ? "selected" : ""}>Pan-seared fish</option>
-                  <option value="veg" ${r.mealPlusOne === "veg" ? "selected" : ""}>Wild mushroom (vegetarian)</option>
-                </select>
-              </div>` : ""}
+            ${r.plusOnes.map((p, i) => `
+              <div class="card" style="margin-bottom:14px; max-width:none;">
+                <div style="font-weight:700; margin-bottom:10px;">Your plus-one: ${escapeHtml(p.name)}</div>
+                <div style="margin-bottom:8px;">Will they be joining?</div>
+                <label style="display:block; margin-bottom:6px; cursor:pointer;">
+                  <input type="radio" name="plusone-status-${i}" value="yes" ${p.status === "yes" ? "checked" : ""} style="margin-right:8px;" /> Joyfully accept
+                </label>
+                <label style="display:block; margin-bottom:${p.status === "yes" ? "14px" : "0"}; cursor:pointer;">
+                  <input type="radio" name="plusone-status-${i}" value="no" ${p.status === "no" ? "checked" : ""} style="margin-right:8px;" /> Regretfully decline
+                </label>
+                ${p.status === "yes" ? `
+                  <div style="margin-bottom:14px;">
+                    <label style="display:block; margin-bottom:6px;">Their meal choice</label>
+                    <select id="plusone-meal-${i}" class="field">
+                      <option value="">Select one</option>
+                      <option value="chicken" ${p.meal === "chicken" ? "selected" : ""}>Herb chicken</option>
+                      <option value="fish" ${p.meal === "fish" ? "selected" : ""}>Pan-seared fish</option>
+                      <option value="veg" ${p.meal === "veg" ? "selected" : ""}>Wild mushroom (vegetarian)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style="display:block; margin-bottom:6px;">Their dietary restrictions or allergies</label>
+                    <input id="plusone-dietary-${i}" class="field" type="text" placeholder="e.g. nut allergy, gluten-free" value="${escapeHtml(p.dietary)}" />
+                  </div>` : ""}
+              </div>`).join("")}
             <div style="margin-bottom:14px;">
               <label style="display:block; margin-bottom:6px;">Song request &#128266;</label>
               <input id="song-request" class="field" type="text" placeholder="What'll get you on the dance floor?" value="${escapeHtml(r.songRequest)}" />
@@ -570,7 +597,7 @@ function render() {
       state.view = "login";
       state.guest = null;
       state.activeTab = "events";
-      state.rsvp = { status: null, mealSelf: "", dietarySelf: "", plusOneName: "", mealPlusOne: "", songRequest: "", note: "" };
+      state.rsvp = { status: null, mealSelf: "", dietarySelf: "", songRequest: "", note: "", plusOnes: [] };
       state.rsvpSubmitted = false;
       state.rsvpEditing = false;
       state.loginError = "";
@@ -601,14 +628,24 @@ function render() {
     };
     bind("meal-self", "mealSelf");
     bind("dietary-self", "dietarySelf");
-    bind("plus-one-name", "plusOneName");
-    bind("meal-plus-one", "mealPlusOne");
     bind("song-request", "songRequest");
     bind("note", "note");
     const mealSelfEl = document.getElementById("meal-self");
     if (mealSelfEl) mealSelfEl.addEventListener("change", (e) => { state.rsvp.mealSelf = e.target.value; });
-    const mealPlusOneEl = document.getElementById("meal-plus-one");
-    if (mealPlusOneEl) mealPlusOneEl.addEventListener("change", (e) => { state.rsvp.mealPlusOne = e.target.value; });
+
+    state.rsvp.plusOnes.forEach((p, i) => {
+      rsvpForm.querySelectorAll(`input[name="plusone-status-${i}"]`).forEach(radio => {
+        radio.addEventListener("change", (e) => {
+          state.rsvp.plusOnes[i].status = e.target.value;
+          state.rsvpSubmitted = false;
+          render();
+        });
+      });
+      const mealEl = document.getElementById(`plusone-meal-${i}`);
+      if (mealEl) mealEl.addEventListener("change", (e) => { state.rsvp.plusOnes[i].meal = e.target.value; });
+      const dietaryEl = document.getElementById(`plusone-dietary-${i}`);
+      if (dietaryEl) dietaryEl.addEventListener("input", (e) => { state.rsvp.plusOnes[i].dietary = e.target.value; });
+    });
 
     rsvpForm.addEventListener("submit", async (e) => {
       e.preventDefault();
