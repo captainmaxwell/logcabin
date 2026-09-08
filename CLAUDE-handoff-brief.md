@@ -60,11 +60,21 @@ Stored in a Google Sheet, two tabs. **Columns are read by position, not by
 header text** — row 1 can contain any labels or be blank; only column order
 matters. This was a deliberate choice to reduce fragile typing requirements.
 
-**Guests tab** — columns A–D:
-`name | isWeddingParty (TRUE/FALSE) | plusOneAllowed (TRUE/FALSE) | invitedEvents (semicolon-separated, e.g. "ceremony;reception")`
+**Guests tab** — columns A–F:
+`name | isWeddingParty (TRUE/FALSE) | plusOneAllowed (TRUE/FALSE, legacy — ignored, kept for history) | invitedEvents (semicolon-separated, e.g. "ceremony;reception") | Type ("Main" or "PlusOne") | LinkedTo (PlusOne rows only: the exact name of the Main invitee they belong to)`
 
-**RSVPs tab** — columns A–J (script appends rows in this exact order):
-`Timestamp | GuestName | IsWeddingParty | Status | MealSelf | DietarySelf | PlusOneName | MealPlusOne | SongRequest | Note`
+Plus-ones are **known in advance, not blank-check** — the couple already
+knows who's coming, so every plus-one gets their own named row in this
+tab rather than a free-text field on the main invitee's row. A main
+invitee can have any number of plus-ones (a whole family, not just one).
+`Type`/`LinkedTo` values should come from Data Validation dropdowns in the
+sheet, not free-typed, since `LinkedTo` has to match a real Main invitee's
+name exactly (fuzzy on whitespace/accents/case, but not on the name
+itself).
+
+**RSVPs tab** — columns A–K, **one row per person** (a main invitee and
+each of their plus-ones each get their own row, not bundled into one):
+`Timestamp | Name | LinkedTo (blank for a main invitee's own row; the main invitee's name for a plus-one's row) | IsWeddingParty | Status | Meal | Dietary | SongRequest (main invitee's row only — shared per party) | Note (main invitee's row only) | LastUpdated | Modified`
 
 Note: semicolons are used instead of commas inside `invitedEvents` to avoid
 needing a quote-aware CSV parser client-side.
@@ -72,10 +82,13 @@ needing a quote-aware CSV parser client-side.
 ## RSVP question set (already decided)
 
 Attending yes/no; meal choice; dietary restrictions/allergies (free text);
-plus-one's name + meal (only shown if `plusOneAllowed`); song request; free
-text note to the couple. This was deliberately kept to "almost always
-included" + "very common" categories from typical wedding RSVP forms —
-resist scope-creeping this further without a reason.
+song request; free text note to the couple — all per the main invitee.
+Each plus-one (if any) gets their own attending yes/no + meal + dietary
+section, shown **only if the main invitee accepts** — a plus-one can't
+attend without their main invitee, though the main invitee can attend
+without them. This was deliberately kept to "almost always included" +
+"very common" categories from typical wedding RSVP forms — resist
+scope-creeping this further without a reason.
 
 ## Current backend: Google Sheets + Apps Script ("Option A")
 
@@ -87,10 +100,13 @@ architecture** — see "Known limitations" below.
 The Apps Script (`apps-script/Code.gs`) is deployed as a Web App
 (`Execute as: Me`, `Who has access: Anyone`) and exposes:
 
-- `doPost(e)` — appends a new row to the RSVPs tab from JSON in the request
-  body. Sent from the client as a plain-text body (not
-  `application/json`) specifically to avoid a CORS preflight request, which
-  Apps Script doesn't handle.
+- `doPost(e)` — writes one RSVPs row per person (the main invitee, plus one
+  row per plus-one they're reporting on), updating each in place if they've
+  already got a row rather than duplicating. Validates the main invitee and
+  every plus-one name against the Guests tab first, rejecting anything that
+  doesn't match a real invitee/linked plus-one. Sent from the client as a
+  plain-text body (not `application/json`) specifically to avoid a CORS
+  preflight request, which Apps Script doesn't handle.
 - `doGet(e)` with `?action=guests` — returns the Guests tab as JSON. This
   replaced an earlier approach of fetching a "Published to web" CSV export
   directly, which failed because Google's CSV publish endpoint doesn't set
