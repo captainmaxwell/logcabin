@@ -69,6 +69,10 @@
     flex: 1 1 280px; max-width: 340px; width: 100%; border-radius: 16px;
     border: 2.5px solid var(--plum); object-fit: cover; max-height: 420px;
   }
+  .venue-photo {
+    width: 100%; max-width: 500px; border-radius: 16px;
+    border: 2.5px solid var(--plum); display: block; margin-bottom: 16px;
+  }
 </style>
 </head>
 <body>
@@ -106,9 +110,12 @@ function daysUntilWedding() {
   return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
 }
 
+const VENUE_MAP_LINK = "https://maps.app.goo.gl/AMKeBu3wMF5qSejb8";
+const VENUE_MAP_HTML = `<br><a href="${VENUE_MAP_LINK}" target="_blank" rel="noopener" style="color:var(--sangria); font-weight:700;">View on Google Maps &rarr;</a>`;
+
 const PUBLIC_EVENTS = [
-  { id: "ceremony", title: "Ceremony", date: "Saturday, May 1, 2027", time: "4:00 PM", location: "Lovers' Lane, Presidio", detail: "An outdoor ceremony under the eucalyptus, fog permitting. Seating starts at 3:30." },
-  { id: "reception", title: "Reception", date: "Saturday, May 1, 2027", time: "6:00 PM", location: "The Interval at Fort Mason", detail: "Dinner, toasts, and dancing with the bay right outside the window." },
+  { id: "ceremony", title: "Ceremony", date: "Saturday, May 1, 2027", time: "4:00 PM", location: "The Log Cabin, Presidio", detail: `An outdoor ceremony under the eucalyptus, fog permitting. Seating starts at 3:30.${VENUE_MAP_HTML}` },
+  { id: "reception", title: "Reception", date: "Saturday, May 1, 2027", time: "6:00 PM &ndash; 10:00 PM", location: "The Log Cabin, Presidio", detail: `Dinner, toasts, and dancing at the Log Cabin, with the Golden Gate Bridge as our backdrop.${VENUE_MAP_HTML}` },
 ];
 const REHEARSAL_DINNER = { title: "Rehearsal Dinner", date: "Friday, April 30, 2027", time: "7:00 PM", location: "Liholiho Yacht Club", detail: "Wedding party and partners. Casual dress, no speeches — we promise." };
 
@@ -385,6 +392,7 @@ function render() {
   } else if (state.activeTab === "events") {
     tabHtml = `<h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Events</h2>
       <div class="countdown" style="margin-bottom:14px;">${daysUntilWedding()} days to go</div>
+      <img class="venue-photo" src="photos/log-cabin-venue.jpg" alt="The Log Cabin at the Presidio, with the Golden Gate Bridge behind it" />
       <div class="cards-grid">
         ${PUBLIC_EVENTS.map(ev => eventCardHtml(ev, false)).join("")}
         ${showRehearsal ? eventCardHtml(REHEARSAL_DINNER, true) : ""}
