@@ -69,6 +69,9 @@
     flex: 1 1 280px; max-width: 340px; width: 100%; border-radius: 16px;
     border: 2.5px solid var(--plum); object-fit: cover; max-height: 420px;
   }
+  .mascot { position: absolute; bottom: 0; width: 64px; opacity: 0.9; pointer-events: none; }
+  .mascot.left { left: 14px; transform: rotate(-6deg); }
+  .mascot.right { right: 14px; transform: rotate(6deg); }
   .venue-photo {
     width: 100%; max-width: 500px; border-radius: 16px;
     border: 2.5px solid var(--plum); display: block; margin-bottom: 16px;
@@ -112,10 +115,12 @@ function daysUntilWedding() {
 
 const VENUE_MAP_LINK = "https://maps.app.goo.gl/AMKeBu3wMF5qSejb8";
 const VENUE_MAP_HTML = `<br><a href="${VENUE_MAP_LINK}" target="_blank" rel="noopener" style="color:var(--sangria); font-weight:700;">View on Google Maps &rarr;</a>`;
+const ZAZIE_MAP_LINK = "https://maps.app.goo.gl/fG2AjyfbZRH15Bbj7";
+const ZAZIE_MAP_HTML = `<br><a href="${ZAZIE_MAP_LINK}" target="_blank" rel="noopener" style="color:var(--sangria); font-weight:700;">View on Google Maps &rarr;</a>`;
 
 const PUBLIC_EVENTS = [
-  { id: "ceremony", title: "Ceremony", date: "Saturday, May 1, 2027", time: "4:00 PM", location: "The Log Cabin, Presidio", detail: `An outdoor ceremony under the eucalyptus, fog permitting. Seating starts at 3:30.${VENUE_MAP_HTML}` },
-  { id: "reception", title: "Reception", date: "Saturday, May 1, 2027", time: "6:00 PM &ndash; 10:00 PM", location: "The Log Cabin, Presidio", detail: `Dinner, toasts, and dancing at the Log Cabin, with the Golden Gate Bridge as our backdrop.${VENUE_MAP_HTML}` },
+  { id: "ceremony-reception", title: "Ceremony &amp; Reception", date: "Saturday, May 1, 2027", time: "4:00 PM &ndash; 10:00 PM", location: "The Log Cabin, Presidio", detail: `An outdoor ceremony under the eucalyptus, fog permitting, followed by dinner, toasts, and dancing at the Log Cabin, with the Golden Gate Bridge as our backdrop. Seating starts at 3:30.${VENUE_MAP_HTML}` },
+  { id: "brunch", title: "Farewell Brunch", date: "Sunday, May 2, 2027", time: "10:00 AM", location: "Zazie", detail: `One more meal together before everyone heads home — hope you can join us!${ZAZIE_MAP_HTML}` },
 ];
 const REHEARSAL_DINNER = { title: "Rehearsal Dinner", date: "Friday, April 30, 2027", time: "7:00 PM", location: "Liholiho Yacht Club", detail: "Wedding party and partners. Casual dress, no speeches — we promise." };
 
@@ -226,7 +231,9 @@ function render() {
 
   if (state.view === "login") {
     app.innerHTML = `
-      <div style="min-height:100vh; display:flex; flex-direction:column;">
+      <div style="min-height:100vh; display:flex; flex-direction:column; position:relative;">
+        <img class="mascot left" src="photos/lav.png" alt="Lav" />
+        <img class="mascot right" src="photos/lenny.png" alt="Lenny" />
         <div class="border-row top">${squiggleSvg()}</div>
         <div style="flex:1; display:flex; align-items:center; justify-content:center; padding:24px;">
           <div style="text-align:center; max-width:400px; width:100%;">
