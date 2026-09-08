@@ -79,6 +79,16 @@
     width: 100%; max-width: 500px; border-radius: 16px;
     display: block; margin-bottom: 16px;
   }
+  .party-table { border-top: 1.5px solid var(--plum); }
+  .party-row {
+    display: flex; flex-wrap: wrap; align-items: center; row-gap: 10px; column-gap: 18px;
+    padding: 14px 0; border-bottom: 1.5px solid var(--plum);
+  }
+  .party-row-name { flex: 1 1 120px; font-weight: 700; }
+  .party-row-status { display: flex; gap: 16px; flex-wrap: wrap; }
+  .party-row-status label, .party-row-meal label { display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 14px; white-space: nowrap; }
+  .party-row-meal { display: flex; gap: 14px; flex-wrap: wrap; }
+  .party-row-dietary { flex: 1 1 100%; }
 </style>
 </head>
 <body>
@@ -485,6 +495,7 @@ function render() {
         <h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:4px;">RSVP</h2>
         <div style="font-size:13px; opacity:0.65; margin-bottom:14px;">Please RSVP by ${RSVP_DEADLINE}</div>
         <form id="rsvp-form" style="max-width:440px;">
+          ${g.plusOnes.length > 0 ? `<div style="font-size:14px; font-weight:700; color:var(--sangria); margin-bottom:16px;">We've reserved ${1 + g.plusOnes.length} seats for you</div>` : ""}
           <div style="margin-bottom:16px;">
             <div style="margin-bottom:8px;">Will you be joining us?</div>
             <label style="display:block; margin-bottom:6px; cursor:pointer;">
@@ -508,31 +519,28 @@ function render() {
               <label style="display:block; margin-bottom:6px;">Dietary restrictions or allergies</label>
               <input id="dietary-self" class="field" type="text" placeholder="e.g. nut allergy, gluten-free" value="${escapeHtml(r.dietarySelf)}" />
             </div>
-            ${r.plusOnes.map((p, i) => `
-              <div class="card" style="margin-bottom:14px; max-width:none;">
-                <div style="font-weight:700; margin-bottom:10px;">Your plus-one: ${escapeHtml(p.name)}</div>
-                <div style="margin-bottom:8px;">Will they be joining?</div>
-                <label style="display:block; margin-bottom:6px; cursor:pointer;">
-                  <input type="radio" name="plusone-status-${i}" value="yes" ${p.status === "yes" ? "checked" : ""} style="margin-right:8px;" /> Joyfully accept
-                </label>
-                <label style="display:block; margin-bottom:${p.status === "yes" ? "14px" : "0"}; cursor:pointer;">
-                  <input type="radio" name="plusone-status-${i}" value="no" ${p.status === "no" ? "checked" : ""} style="margin-right:8px;" /> Regretfully decline
-                </label>
-                ${p.status === "yes" ? `
-                  <div style="margin-bottom:14px;">
-                    <label style="display:block; margin-bottom:6px;">Their meal choice</label>
-                    <select id="plusone-meal-${i}" class="field">
-                      <option value="">Select one</option>
-                      <option value="chicken" ${p.meal === "chicken" ? "selected" : ""}>Herb chicken</option>
-                      <option value="fish" ${p.meal === "fish" ? "selected" : ""}>Pan-seared fish</option>
-                      <option value="veg" ${p.meal === "veg" ? "selected" : ""}>Wild mushroom (vegetarian)</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label style="display:block; margin-bottom:6px;">Their dietary restrictions or allergies</label>
-                    <input id="plusone-dietary-${i}" class="field" type="text" placeholder="e.g. nut allergy, gluten-free" value="${escapeHtml(p.dietary)}" />
-                  </div>` : ""}
-              </div>`).join("")}
+            ${r.plusOnes.length > 0 ? `
+              <div style="margin-bottom:14px;">
+                <label style="display:block; margin-bottom:6px;">Your party</label>
+                <div class="party-table">
+                  ${r.plusOnes.map((p, i) => `
+                    <div class="party-row">
+                      <div class="party-row-name">${escapeHtml(p.name)}</div>
+                      <div class="party-row-status">
+                        <label><input type="radio" name="plusone-status-${i}" value="yes" ${p.status === "yes" ? "checked" : ""} /> Accept</label>
+                        <label><input type="radio" name="plusone-status-${i}" value="no" ${p.status === "no" ? "checked" : ""} /> Decline</label>
+                      </div>
+                      ${p.status === "yes" ? `
+                        <div class="party-row-meal">
+                          <label><input type="radio" name="plusone-meal-${i}" value="chicken" ${p.meal === "chicken" ? "checked" : ""} /> Chicken</label>
+                          <label><input type="radio" name="plusone-meal-${i}" value="fish" ${p.meal === "fish" ? "checked" : ""} /> Fish</label>
+                          <label><input type="radio" name="plusone-meal-${i}" value="veg" ${p.meal === "veg" ? "checked" : ""} /> Veg</label>
+                        </div>
+                        <input id="plusone-dietary-${i}" class="field party-row-dietary" type="text" placeholder="Allergy or dietary note (optional)" value="${escapeHtml(p.dietary)}" />
+                      ` : ""}
+                    </div>`).join("")}
+                </div>
+              </div>` : ""}
             <div style="margin-bottom:14px;">
               <label style="display:block; margin-bottom:6px;">Song request &#128266;</label>
               <input id="song-request" class="field" type="text" placeholder="What'll get you on the dance floor?" value="${escapeHtml(r.songRequest)}" />
@@ -641,8 +649,9 @@ function render() {
           render();
         });
       });
-      const mealEl = document.getElementById(`plusone-meal-${i}`);
-      if (mealEl) mealEl.addEventListener("change", (e) => { state.rsvp.plusOnes[i].meal = e.target.value; });
+      rsvpForm.querySelectorAll(`input[name="plusone-meal-${i}"]`).forEach(radio => {
+        radio.addEventListener("change", (e) => { state.rsvp.plusOnes[i].meal = e.target.value; });
+      });
       const dietaryEl = document.getElementById(`plusone-dietary-${i}`);
       if (dietaryEl) dietaryEl.addEventListener("input", (e) => { state.rsvp.plusOnes[i].dietary = e.target.value; });
     });
