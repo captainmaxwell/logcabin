@@ -210,6 +210,14 @@ async function loadAllRsvps(passcode) {
   rows.sort((a, b) => (sortKey(a) < sortKey(b) ? 1 : -1));
   return rows;
 }
+// Guest-submitted text (note, song request, dietary info, etc.) is rendered
+// via innerHTML both in the guest's own form and the admin table — escape it
+// so a crafted RSVP can't inject markup/script into either.
+function escapeHtml(str) {
+  return String(str ?? "").replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[c]));
+}
 function rowsToCsv(rows) {
   const cols = ["guestName","isWeddingParty","status","mealSelf","dietarySelf","plusOneName","mealPlusOne","songRequest","note","timestamp","lastUpdated","modified"];
   const esc = (v) => {
@@ -365,15 +373,15 @@ function render() {
                 ${rows.map(r => {
                   const isModified = r.modified === true || String(r.modified).toUpperCase() === "TRUE";
                   return `<tr${isModified ? ' style="background: #fdf0f3;"' : ''}>
-                  <td>${r.guestName || ""}</td>
+                  <td>${escapeHtml(r.guestName)}</td>
                   <td>${r.isWeddingParty ? "Yes" : ""}</td>
-                  <td>${r.status || ""}</td>
-                  <td>${r.mealSelf || ""}</td>
-                  <td>${r.dietarySelf || ""}</td>
-                  <td>${r.plusOneName || ""}</td>
-                  <td>${r.mealPlusOne || ""}</td>
-                  <td>${r.songRequest || ""}</td>
-                  <td>${r.note || ""}</td>
+                  <td>${escapeHtml(r.status)}</td>
+                  <td>${escapeHtml(r.mealSelf)}</td>
+                  <td>${escapeHtml(r.dietarySelf)}</td>
+                  <td>${escapeHtml(r.plusOneName)}</td>
+                  <td>${escapeHtml(r.mealPlusOne)}</td>
+                  <td>${escapeHtml(r.songRequest)}</td>
+                  <td>${escapeHtml(r.note)}</td>
                   <td>${r.timestamp ? new Date(r.timestamp).toLocaleString() : ""}</td>
                   <td>${isModified ? `<span style="color:var(--sangria); font-weight:700;">Edited</span><br>${r.lastUpdated ? new Date(r.lastUpdated).toLocaleString() : ""}` : "—"}</td>
                 </tr>`;
@@ -454,12 +462,12 @@ function render() {
             </div>
             <div style="margin-bottom:14px;">
               <label style="display:block; margin-bottom:6px;">Dietary restrictions or allergies</label>
-              <input id="dietary-self" class="field" type="text" placeholder="e.g. nut allergy, gluten-free" value="${r.dietarySelf}" />
+              <input id="dietary-self" class="field" type="text" placeholder="e.g. nut allergy, gluten-free" value="${escapeHtml(r.dietarySelf)}" />
             </div>
             ${g.plusOneAllowed ? `
               <div style="margin-bottom:14px;">
                 <label style="display:block; margin-bottom:6px;">Plus-one's name</label>
-                <input id="plus-one-name" class="field" type="text" placeholder="Who's coming with you?" value="${r.plusOneName}" />
+                <input id="plus-one-name" class="field" type="text" placeholder="Who's coming with you?" value="${escapeHtml(r.plusOneName)}" />
               </div>
               <div style="margin-bottom:14px;">
                 <label style="display:block; margin-bottom:6px;">Plus-one's meal choice</label>
@@ -472,11 +480,11 @@ function render() {
               </div>` : ""}
             <div style="margin-bottom:14px;">
               <label style="display:block; margin-bottom:6px;">Song request &#128266;</label>
-              <input id="song-request" class="field" type="text" placeholder="What'll get you on the dance floor?" value="${r.songRequest}" />
+              <input id="song-request" class="field" type="text" placeholder="What'll get you on the dance floor?" value="${escapeHtml(r.songRequest)}" />
             </div>
             <div style="margin-bottom:14px;">
               <label style="display:block; margin-bottom:6px;">Note for the couple (optional)</label>
-              <textarea id="note" class="field" rows="3" placeholder="Well wishes, questions, anything!">${r.note}</textarea>
+              <textarea id="note" class="field" rows="3" placeholder="Well wishes, questions, anything!">${escapeHtml(r.note)}</textarea>
             </div>
           ` : ""}
           <button type="submit" class="btn" ${!r.status ? "disabled" : ""}>${state.rsvpSaving ? "Saving…" : "Send RSVP"}</button>
