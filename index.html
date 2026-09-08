@@ -89,6 +89,20 @@
   .party-row-status label, .party-row-meal label { display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 14px; white-space: nowrap; }
   .party-row-meal { display: flex; gap: 14px; flex-wrap: wrap; }
   .party-row-dietary { flex: 1 1 100%; }
+  .party-row-confirmed { font-size: 14px; color: var(--sangria); font-weight: 700; white-space: nowrap; }
+  .circle-choice {
+    position: relative; display: inline-flex; align-items: center;
+    padding: 5px 12px; cursor: pointer; font-size: 14px; white-space: nowrap;
+    z-index: 0;
+  }
+  .circle-choice input {
+    position: absolute; opacity: 0; width: 100%; height: 100%; top: 0; left: 0;
+    margin: 0; cursor: pointer;
+  }
+  .circle-choice svg {
+    position: absolute; inset: -10px -10px -6px -6px; width: calc(100% + 20px); height: calc(100% + 16px);
+    pointer-events: none;
+  }
 </style>
 </head>
 <body>
@@ -251,6 +265,17 @@ async function loadAllRsvps(passcode) {
 // Guest-submitted text (note, song request, dietary info, etc.) is rendered
 // via innerHTML both in the guest's own form and the admin table — escape it
 // so a crafted RSVP can't inject markup/script into either.
+// Renders a radio option that looks hand-circled (in red) when selected,
+// instead of a plain radio button — used everywhere in the RSVP form.
+function circleChoice(name, value, label, checked) {
+  return `<label class="circle-choice">
+    <input type="radio" name="${name}" value="${value}" ${checked ? "checked" : ""} />
+    <span>${label}</span>
+    ${checked ? `<svg viewBox="0 0 120 50" preserveAspectRatio="none">
+      <path d="M6,26 C3.7,10 29.2,4 60.6,5 C96.6,6 116.3,14 114,26 C111.7,39 85,45 55.9,44 C23.4,43 0.2,36 4.8,23" fill="none" stroke="var(--sangria)" stroke-width="4" stroke-linecap="round"/>
+    </svg>` : ""}
+  </label>`;
+}
 function escapeHtml(str) {
   return String(str ?? "").replace(/[&<>"']/g, (c) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
@@ -498,49 +523,43 @@ function render() {
           ${g.plusOnes.length > 0 ? `<div style="font-size:14px; font-weight:700; color:var(--sangria); margin-bottom:16px;">We've reserved ${1 + g.plusOnes.length} seats for you</div>` : ""}
           <div style="margin-bottom:16px;">
             <div style="margin-bottom:8px;">Will you be joining us?</div>
-            <label style="display:block; margin-bottom:6px; cursor:pointer;">
-              <input type="radio" name="rsvp-status" value="yes" ${r.status === "yes" ? "checked" : ""} style="margin-right:8px;" /> Joyfully accept
-            </label>
-            <label style="display:block; margin-bottom:6px; cursor:pointer;">
-              <input type="radio" name="rsvp-status" value="no" ${r.status === "no" ? "checked" : ""} style="margin-right:8px;" /> Regretfully decline
-            </label>
+            <div style="display:flex; flex-wrap:wrap; gap:6px;">
+              ${circleChoice("rsvp-status", "yes", "Joyfully accept", r.status === "yes")}
+              ${circleChoice("rsvp-status", "no", "Regretfully decline", r.status === "no")}
+            </div>
           </div>
-          ${r.status === "yes" ? `
+          ${r.status === "yes" ? (g.plusOnes.length > 0 ? `
             <div style="margin-bottom:14px;">
-              <label style="display:block; margin-bottom:6px;">Your meal choice</label>
-              <select id="meal-self" class="field">
-                <option value="">Select one</option>
-                <option value="chicken" ${r.mealSelf === "chicken" ? "selected" : ""}>Herb chicken</option>
-                <option value="fish" ${r.mealSelf === "fish" ? "selected" : ""}>Pan-seared fish</option>
-                <option value="veg" ${r.mealSelf === "veg" ? "selected" : ""}>Wild mushroom (vegetarian)</option>
-              </select>
-            </div>
-            <div style="margin-bottom:14px;">
-              <label style="display:block; margin-bottom:6px;">Dietary restrictions or allergies</label>
-              <input id="dietary-self" class="field" type="text" placeholder="e.g. nut allergy, gluten-free" value="${escapeHtml(r.dietarySelf)}" />
-            </div>
-            ${r.plusOnes.length > 0 ? `
-              <div style="margin-bottom:14px;">
-                <label style="display:block; margin-bottom:6px;">Your party</label>
-                <div class="party-table">
-                  ${r.plusOnes.map((p, i) => `
-                    <div class="party-row">
-                      <div class="party-row-name">${escapeHtml(p.name)}</div>
-                      <div class="party-row-status">
-                        <label><input type="radio" name="plusone-status-${i}" value="yes" ${p.status === "yes" ? "checked" : ""} /> Accept</label>
-                        <label><input type="radio" name="plusone-status-${i}" value="no" ${p.status === "no" ? "checked" : ""} /> Decline</label>
-                      </div>
-                      ${p.status === "yes" ? `
-                        <div class="party-row-meal">
-                          <label><input type="radio" name="plusone-meal-${i}" value="chicken" ${p.meal === "chicken" ? "checked" : ""} /> Chicken</label>
-                          <label><input type="radio" name="plusone-meal-${i}" value="fish" ${p.meal === "fish" ? "checked" : ""} /> Fish</label>
-                          <label><input type="radio" name="plusone-meal-${i}" value="veg" ${p.meal === "veg" ? "checked" : ""} /> Veg</label>
-                        </div>
-                        <input id="plusone-dietary-${i}" class="field party-row-dietary" type="text" placeholder="Allergy or dietary note (optional)" value="${escapeHtml(p.dietary)}" />
-                      ` : ""}
-                    </div>`).join("")}
+              <label style="display:block; margin-bottom:6px;">Your party</label>
+              <div class="party-table">
+                <div class="party-row">
+                  <div class="party-row-name">${escapeHtml(g.name.split(" ")[0])} (you)</div>
+                  <div class="party-row-status"><span class="party-row-confirmed">Attending</span></div>
+                  <div class="party-row-meal">
+                    ${circleChoice("meal-self", "chicken", "Chicken", r.mealSelf === "chicken")}
+                    ${circleChoice("meal-self", "fish", "Fish", r.mealSelf === "fish")}
+                    ${circleChoice("meal-self", "veg", "Veg", r.mealSelf === "veg")}
+                  </div>
+                  <input id="dietary-self" class="field party-row-dietary" type="text" placeholder="Allergy or dietary note (optional)" value="${escapeHtml(r.dietarySelf)}" />
                 </div>
-              </div>` : ""}
+                ${r.plusOnes.map((p, i) => `
+                  <div class="party-row">
+                    <div class="party-row-name">${escapeHtml(p.name)}</div>
+                    <div class="party-row-status">
+                      ${circleChoice(`plusone-status-${i}`, "yes", "Accept", p.status === "yes")}
+                      ${circleChoice(`plusone-status-${i}`, "no", "Decline", p.status === "no")}
+                    </div>
+                    ${p.status === "yes" ? `
+                      <div class="party-row-meal">
+                        ${circleChoice(`plusone-meal-${i}`, "chicken", "Chicken", p.meal === "chicken")}
+                        ${circleChoice(`plusone-meal-${i}`, "fish", "Fish", p.meal === "fish")}
+                        ${circleChoice(`plusone-meal-${i}`, "veg", "Veg", p.meal === "veg")}
+                      </div>
+                      <input id="plusone-dietary-${i}" class="field party-row-dietary" type="text" placeholder="Allergy or dietary note (optional)" value="${escapeHtml(p.dietary)}" />
+                    ` : ""}
+                  </div>`).join("")}
+              </div>
+            </div>
             <div style="margin-bottom:14px;">
               <label style="display:block; margin-bottom:6px;">Song request &#128266;</label>
               <input id="song-request" class="field" type="text" placeholder="What'll get you on the dance floor?" value="${escapeHtml(r.songRequest)}" />
@@ -549,7 +568,28 @@ function render() {
               <label style="display:block; margin-bottom:6px;">Note for the couple (optional)</label>
               <textarea id="note" class="field" rows="3" placeholder="Well wishes, questions, anything!">${escapeHtml(r.note)}</textarea>
             </div>
-          ` : ""}
+          ` : `
+            <div style="margin-bottom:14px;">
+              <label style="display:block; margin-bottom:6px;">Your meal choice</label>
+              <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                ${circleChoice("meal-self", "chicken", "Herb chicken", r.mealSelf === "chicken")}
+                ${circleChoice("meal-self", "fish", "Pan-seared fish", r.mealSelf === "fish")}
+                ${circleChoice("meal-self", "veg", "Wild mushroom (vegetarian)", r.mealSelf === "veg")}
+              </div>
+            </div>
+            <div style="margin-bottom:14px;">
+              <label style="display:block; margin-bottom:6px;">Dietary restrictions or allergies</label>
+              <input id="dietary-self" class="field" type="text" placeholder="e.g. nut allergy, gluten-free" value="${escapeHtml(r.dietarySelf)}" />
+            </div>
+            <div style="margin-bottom:14px;">
+              <label style="display:block; margin-bottom:6px;">Song request &#128266;</label>
+              <input id="song-request" class="field" type="text" placeholder="What'll get you on the dance floor?" value="${escapeHtml(r.songRequest)}" />
+            </div>
+            <div style="margin-bottom:14px;">
+              <label style="display:block; margin-bottom:6px;">Note for the couple (optional)</label>
+              <textarea id="note" class="field" rows="3" placeholder="Well wishes, questions, anything!">${escapeHtml(r.note)}</textarea>
+            </div>
+          `) : ""}
           <button type="submit" class="btn" ${!r.status ? "disabled" : ""}>${state.rsvpSaving ? "Saving…" : "Send RSVP"}</button>
         </form>
       `;
@@ -634,12 +674,15 @@ function render() {
       const el = document.getElementById(id);
       if (el) el.addEventListener("input", (e) => { state.rsvp[key] = e.target.value; });
     };
-    bind("meal-self", "mealSelf");
     bind("dietary-self", "dietarySelf");
     bind("song-request", "songRequest");
     bind("note", "note");
-    const mealSelfEl = document.getElementById("meal-self");
-    if (mealSelfEl) mealSelfEl.addEventListener("change", (e) => { state.rsvp.mealSelf = e.target.value; });
+    rsvpForm.querySelectorAll('input[name="meal-self"]').forEach(radio => {
+      radio.addEventListener("change", (e) => {
+        state.rsvp.mealSelf = e.target.value;
+        render();
+      });
+    });
 
     state.rsvp.plusOnes.forEach((p, i) => {
       rsvpForm.querySelectorAll(`input[name="plusone-status-${i}"]`).forEach(radio => {
@@ -650,7 +693,10 @@ function render() {
         });
       });
       rsvpForm.querySelectorAll(`input[name="plusone-meal-${i}"]`).forEach(radio => {
-        radio.addEventListener("change", (e) => { state.rsvp.plusOnes[i].meal = e.target.value; });
+        radio.addEventListener("change", (e) => {
+          state.rsvp.plusOnes[i].meal = e.target.value;
+          render();
+        });
       });
       const dietaryEl = document.getElementById(`plusone-dietary-${i}`);
       if (dietaryEl) dietaryEl.addEventListener("input", (e) => { state.rsvp.plusOnes[i].dietary = e.target.value; });
