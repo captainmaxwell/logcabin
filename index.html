@@ -81,12 +81,13 @@
   }
   .party-table { border-top: 1.5px solid var(--plum); }
   .party-row {
-    display: flex; flex-wrap: wrap; align-items: center; row-gap: 10px; column-gap: 18px;
     padding: 14px 0; border-bottom: 1.5px solid var(--plum);
   }
+  .party-row-top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; row-gap: 8px; column-gap: 18px; }
   .party-row-name { flex: 1 1 120px; font-weight: 700; }
   .party-row-status { display: flex; gap: 16px; flex-wrap: wrap; }
   .party-row-status label, .party-row-meal label { display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 14px; white-space: nowrap; }
+  .party-row-bottom { display: flex; align-items: center; flex-wrap: wrap; row-gap: 10px; column-gap: 18px; margin-top: 10px; }
   .party-row-meal { display: flex; gap: 14px; flex-wrap: wrap; }
   .party-row-dietary { flex: 1 1 100%; }
   .party-row-confirmed { font-size: 14px; color: var(--sangria); font-weight: 700; white-space: nowrap; }
@@ -533,29 +534,37 @@ function render() {
               <label style="display:block; margin-bottom:6px;">Your party</label>
               <div class="party-table">
                 <div class="party-row">
-                  <div class="party-row-name">${escapeHtml(g.name.split(" ")[0])} (you)</div>
-                  <div class="party-row-status"><span class="party-row-confirmed">Attending</span></div>
-                  <div class="party-row-meal">
-                    ${circleChoice("meal-self", "chicken", "Chicken", r.mealSelf === "chicken")}
-                    ${circleChoice("meal-self", "fish", "Fish", r.mealSelf === "fish")}
-                    ${circleChoice("meal-self", "veg", "Veg", r.mealSelf === "veg")}
+                  <div class="party-row-top">
+                    <div class="party-row-name">${escapeHtml(g.name.split(" ")[0])} (you)</div>
+                    <div class="party-row-status"><span class="party-row-confirmed">Attending</span></div>
                   </div>
-                  <input id="dietary-self" class="field party-row-dietary" type="text" placeholder="Allergy or dietary note (optional)" value="${escapeHtml(r.dietarySelf)}" />
+                  <div class="party-row-bottom">
+                    <div class="party-row-meal">
+                      ${circleChoice("meal-self", "chicken", "Chicken", r.mealSelf === "chicken")}
+                      ${circleChoice("meal-self", "fish", "Fish", r.mealSelf === "fish")}
+                      ${circleChoice("meal-self", "veg", "Veg", r.mealSelf === "veg")}
+                    </div>
+                    <input id="dietary-self" class="field party-row-dietary" type="text" placeholder="Allergy or dietary note (optional)" value="${escapeHtml(r.dietarySelf)}" />
+                  </div>
                 </div>
                 ${r.plusOnes.map((p, i) => `
                   <div class="party-row">
-                    <div class="party-row-name">${escapeHtml(p.name)}</div>
-                    <div class="party-row-status">
-                      ${circleChoice(`plusone-status-${i}`, "yes", "Accept", p.status === "yes")}
-                      ${circleChoice(`plusone-status-${i}`, "no", "Decline", p.status === "no")}
+                    <div class="party-row-top">
+                      <div class="party-row-name">${escapeHtml(p.name)}</div>
+                      <div class="party-row-status">
+                        ${circleChoice(`plusone-status-${i}`, "yes", "Accept", p.status === "yes")}
+                        ${circleChoice(`plusone-status-${i}`, "no", "Decline", p.status === "no")}
+                      </div>
                     </div>
                     ${p.status === "yes" ? `
-                      <div class="party-row-meal">
-                        ${circleChoice(`plusone-meal-${i}`, "chicken", "Chicken", p.meal === "chicken")}
-                        ${circleChoice(`plusone-meal-${i}`, "fish", "Fish", p.meal === "fish")}
-                        ${circleChoice(`plusone-meal-${i}`, "veg", "Veg", p.meal === "veg")}
+                      <div class="party-row-bottom">
+                        <div class="party-row-meal">
+                          ${circleChoice(`plusone-meal-${i}`, "chicken", "Chicken", p.meal === "chicken")}
+                          ${circleChoice(`plusone-meal-${i}`, "fish", "Fish", p.meal === "fish")}
+                          ${circleChoice(`plusone-meal-${i}`, "veg", "Veg", p.meal === "veg")}
+                        </div>
+                        <input id="plusone-dietary-${i}" class="field party-row-dietary" type="text" placeholder="Allergy or dietary note (optional)" value="${escapeHtml(p.dietary)}" />
                       </div>
-                      <input id="plusone-dietary-${i}" class="field party-row-dietary" type="text" placeholder="Allergy or dietary note (optional)" value="${escapeHtml(p.dietary)}" />
                     ` : ""}
                   </div>`).join("")}
               </div>
