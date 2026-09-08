@@ -190,11 +190,12 @@ async function loadAllRsvps(passcode) {
   const data = await res.json();
   if (data.error) throw new Error(data.error);
   const rows = data.rows || [];
-  rows.sort((a, b) => (a.timestamp < b.timestamp ? 1 : -1));
+  const sortKey = (r) => r.lastUpdated || r.timestamp;
+  rows.sort((a, b) => (sortKey(a) < sortKey(b) ? 1 : -1));
   return rows;
 }
 function rowsToCsv(rows) {
-  const cols = ["guestName","isWeddingParty","status","mealSelf","dietarySelf","plusOneName","mealPlusOne","songRequest","note","timestamp"];
+  const cols = ["guestName","isWeddingParty","status","mealSelf","dietarySelf","plusOneName","mealPlusOne","songRequest","note","timestamp","lastUpdated","modified"];
   const esc = (v) => {
     const s = (v === undefined || v === null) ? "" : String(v);
     return '"' + s.replace(/"/g, '""') + '"';
@@ -321,6 +322,7 @@ function render() {
     const rows = state.adminRows || [];
     const yesCount = rows.filter(r => r.status === "yes").length;
     const noCount = rows.filter(r => r.status === "no").length;
+    const modifiedCount = rows.filter(r => r.modified === true || String(r.modified).toUpperCase() === "TRUE").length;
     app.innerHTML = `
       <div style="max-width:900px; margin:0 auto; padding:32px 24px 60px;">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:18px;">
@@ -330,17 +332,19 @@ function render() {
             <button id="export-btn" class="btn" ${rows.length === 0 ? "disabled" : ""}>Export CSV</button>
           </div>
         </div>
-        <div style="font-size:14px; margin-bottom:18px;">${state.adminLoading ? "Loading…" : `${yesCount} attending &middot; ${noCount} declined &middot; ${rows.length} total responses`}</div>
+        <div style="font-size:14px; margin-bottom:18px;">${state.adminLoading ? "Loading…" : `${yesCount} attending &middot; ${noCount} declined &middot; ${rows.length} total responses${modifiedCount > 0 ? ` &middot; <span style="color:var(--sangria); font-weight:700;">${modifiedCount} edited</span>` : ""}`}</div>
         ${rows.length === 0 && !state.adminLoading ? `<div style="font-size:14px; opacity:0.7;">No responses yet.</div>` : ""}
         ${rows.length > 0 ? `
           <div style="overflow-x:auto;">
             <table>
               <thead><tr>
                 <th>Guest</th><th>Wedding party</th><th>Status</th><th>Meal</th><th>Dietary</th>
-                <th>Plus-one</th><th>Plus-one meal</th><th>Song request</th><th>Note</th><th>Submitted</th>
+                <th>Plus-one</th><th>Plus-one meal</th><th>Song request</th><th>Note</th><th>Submitted</th><th>Last updated</th>
               </tr></thead>
               <tbody>
-                ${rows.map(r => `<tr>
+                ${rows.map(r => {
+                  const isModified = r.modified === true || String(r.modified).toUpperCase() === "TRUE";
+                  return `<tr${isModified ? ' style="background: #fdf0f3;"' : ''}>
                   <td>${r.guestName || ""}</td>
                   <td>${r.isWeddingParty ? "Yes" : ""}</td>
                   <td>${r.status || ""}</td>
@@ -351,7 +355,9 @@ function render() {
                   <td>${r.songRequest || ""}</td>
                   <td>${r.note || ""}</td>
                   <td>${r.timestamp ? new Date(r.timestamp).toLocaleString() : ""}</td>
-                </tr>`).join("")}
+                  <td>${isModified ? `<span style="color:var(--sangria); font-weight:700;">Edited</span><br>${r.lastUpdated ? new Date(r.lastUpdated).toLocaleString() : ""}` : "—"}</td>
+                </tr>`;
+                }).join("")}
               </tbody>
             </table>
           </div>` : ""}
