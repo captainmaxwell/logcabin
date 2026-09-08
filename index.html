@@ -163,9 +163,10 @@ const TABS = [
 ];
 
 function eventCardHtml(ev, rehearsal) {
+  const meta = [ev.date, ev.time, ev.location].filter(Boolean).join(" &middot; ");
   return `<div class="card ${rehearsal ? 'rehearsal' : ''}">
     <div class="display" style="font-size:20px;">${ev.title}</div>
-    <div style="font-size:13px; opacity:0.7; margin:4px 0 8px;">${ev.date} &middot; ${ev.time} &middot; ${ev.location}</div>
+    <div style="font-size:13px; opacity:0.7; margin:4px 0 8px;">${meta}</div>
     <div style="font-size:14px; max-width:46ch;">${ev.detail}</div>
   </div>`;
 }
@@ -472,7 +473,7 @@ function render() {
     tabHtml = `<h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Travel</h2>
       <p style="max-width:55ch; line-height:1.6; margin-bottom:16px;">Fly into SFO or OAK. Both venues are a short rideshare from downtown; parking is limited at the Presidio, so carpooling or rideshare is easiest.</p>
       <div class="cards-grid">
-        ${eventCardHtml({ title: "Hotel block", date: "Mentions rate + deadline", time: "", location: "Hotel name, neighborhood", detail: "Add your negotiated room block details and booking link here." }, false)}
+        ${eventCardHtml({ title: "The Argonaut Hotel", date: "Room block rate &amp; booking deadline: TBD", time: "", location: "Fisherman's Wharf, San Francisco", detail: `We've picked out the Argonaut for our room block — a nautical-themed hotel right on Fisherman's Wharf. Rate and booking link coming soon.<br><a href="https://maps.app.goo.gl/aZDg99RFGRjBZwgB7" target="_blank" rel="noopener" style="color:var(--sangria); font-weight:700;">View on Google Maps &rarr;</a>` }, false)}
       </div>`;
   } else if (state.activeTab === "registry") {
     tabHtml = `<h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Registry</h2>
