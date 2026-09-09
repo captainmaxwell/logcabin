@@ -46,9 +46,12 @@
     padding: 8px 2px; margin-right: 24px; cursor: pointer; color: var(--plum); opacity: 0.55; font-size: 15px;
   }
   .tab-btn.active { border-bottom-color: var(--sangria); opacity: 1; }
+  .tab-nav-wrap {
+    position: sticky; top: 0; z-index: 10; width: 100vw; margin-left: calc(50% - 50vw);
+    background: var(--cream); border-bottom: 2px solid var(--plum);
+  }
   .tab-nav {
-    display: flex; flex-wrap: wrap; position: sticky; top: 0; z-index: 10;
-    background: var(--cream); padding: 8px 0; border-bottom: 2px solid var(--plum);
+    display: flex; flex-wrap: wrap; max-width: 900px; margin: 0 auto; padding: 8px 32px;
   }
   .card {
     border: none; border-radius: 16px; padding: 18px 22px;
@@ -638,8 +641,10 @@ function render() {
       <div style="font-size:12px; opacity:0.65; margin:10px 0 14px;">Hi ${g.name.split(" ")[0]} &middot; May 1, 2027, San Francisco &middot; ${daysUntilWedding()} days to go</div>
     </header>
     <main style="max-width:900px; margin:0 auto; padding:0 32px 70px;">
-      <div class="tab-nav">
-        ${TABS.map(t => `<button class="tab-btn ${state.activeTab === t.id ? "active" : ""}" data-tab="${t.id}">${t.label}</button>`).join("")}
+      <div class="tab-nav-wrap">
+        <div class="tab-nav">
+          ${TABS.map(t => `<button class="tab-btn ${state.activeTab === t.id ? "active" : ""}" data-tab="${t.id}">${t.label}</button>`).join("")}
+        </div>
       </div>
       <div style="padding-top:32px;">${tabHtml}</div>
     </main>
