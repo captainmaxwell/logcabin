@@ -111,7 +111,7 @@
     position: absolute; inset: -10px -10px -6px -6px; width: calc(100% + 20px); height: calc(100% + 16px);
     pointer-events: none;
   }
-  .circle-choice svg path {
+  .circle-choice svg.circle-draw path {
     stroke-dasharray: 255; stroke-dashoffset: 255;
     animation: draw-circle 0.28s ease-out forwards;
   }
@@ -217,6 +217,12 @@ const state = {
   adminPasscode: "",    // kept only so "Refresh" can re-authenticate
 };
 
+// Not part of `state` (never submitted, not RSVP data) — tracks which radio
+// was just changed so only *that* circle plays its draw-in animation on the
+// next render, instead of every already-selected circle on the page
+// replaying it just because the whole form re-renders from scratch.
+let justPicked = null; // { name, value } | null
+
 const ALL_TABS = [
   { id: "story", label: "Our story" },
   { id: "events", label: "Events" },
@@ -283,10 +289,11 @@ async function loadAllRsvps(passcode) {
 // Renders a radio option that looks hand-circled (in red) when selected,
 // instead of a plain radio button — used everywhere in the RSVP form.
 function circleChoice(name, value, label, checked) {
+  const animate = !!(checked && justPicked && justPicked.name === name && justPicked.value === value);
   return `<label class="circle-choice">
     <input type="radio" name="${name}" value="${value}" ${checked ? "checked" : ""} />
     <span>${label}</span>
-    ${checked ? `<svg viewBox="0 0 120 50" preserveAspectRatio="none">
+    ${checked ? `<svg viewBox="0 0 120 50" preserveAspectRatio="none" class="${animate ? "circle-draw" : ""}">
       <path d="M6,26 C3.7,10 29.2,4 60.6,5 C96.6,6 116.3,14 114,26 C111.7,39 85,45 55.9,44 C23.4,43 0.2,36 4.8,23" fill="none" stroke="var(--forest)" stroke-width="4" stroke-linecap="round"/>
     </svg>` : ""}
   </label>`;
@@ -659,6 +666,7 @@ function render() {
       <div style="padding-top:32px;">${tabHtml}</div>
     </main>
   `;
+  justPicked = null; // consumed by the render just above — don't animate again next time
 
   document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", () => { state.activeTab = btn.dataset.tab; render(); });
@@ -692,6 +700,7 @@ function render() {
       radio.addEventListener("change", (e) => {
         state.rsvp.status = e.target.value;
         state.rsvpSubmitted = false;
+        justPicked = { name: e.target.name, value: e.target.value };
         render();
       });
     });
@@ -705,6 +714,7 @@ function render() {
     rsvpForm.querySelectorAll('input[name="meal-self"]').forEach(radio => {
       radio.addEventListener("change", (e) => {
         state.rsvp.mealSelf = e.target.value;
+        justPicked = { name: e.target.name, value: e.target.value };
         render();
       });
     });
@@ -714,12 +724,14 @@ function render() {
         radio.addEventListener("change", (e) => {
           state.rsvp.plusOnes[i].status = e.target.value;
           state.rsvpSubmitted = false;
+          justPicked = { name: e.target.name, value: e.target.value };
           render();
         });
       });
       rsvpForm.querySelectorAll(`input[name="plusone-meal-${i}"]`).forEach(radio => {
         radio.addEventListener("change", (e) => {
           state.rsvp.plusOnes[i].meal = e.target.value;
+          justPicked = { name: e.target.name, value: e.target.value };
           render();
         });
       });
