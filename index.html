@@ -256,22 +256,47 @@ const RSVP_DEADLINE = "Saturday, April 3, 2027"; // 4 weeks before the wedding �
 // ready to share. Nothing behind this flag is deleted — just hidden.
 const SAVE_THE_DATE_MODE = true;
 
-// SHA-256 of the shared save-the-date password, after normalizeName(). Stored
-// as a hash so the password isn't sitting in the page source in plain sight.
+// PBKDF2-derived hash of the shared save-the-date password, after
+// normalizeName(). Stored as salt + iterations + derived hash so the password
+// isn't sitting in the page source in plain sight.
 //
 // Be clear-eyed about what this does and doesn't do: it stops someone reading
-// the password out of View Source. It does NOT protect the site — every tab's
-// content is in this file, which the host serves to anyone who asks, so the
-// gate is a speed bump either way. A short password also won't survive a
-// determined brute-force against a known hash. Don't put anything genuinely
-// private behind it.
+// the password out of View Source, and — because PBKDF2 is deliberately slow —
+// makes brute-forcing the published hash back to the password impractical for a
+// short password too. It does NOT protect the site: every tab's content is in
+// this file, which the host serves to anyone who asks, so the gate is a speed
+// bump either way. Don't put anything genuinely private behind it.
 //
-// To change it: node -e 'console.log(require("crypto").createHash("sha256").update("newpassword").digest("hex"))'
-const SAVE_THE_DATE_PASSWORD_SHA256 = "d2df8693d902bc6b548f2aef3b09565e4ea33d607f7dfab08817ad143530d0ef";
+// To change it, run and paste the three values below:
+//   node -e 'const c=require("crypto");const s=c.randomBytes(16);const i=250000;
+//     const dk=c.pbkdf2Sync("newpassword".trim().toLowerCase(),s,i,32,"sha256");
+//     console.log(s.toString("hex"),i,dk.toString("hex"))'
+// (normalizeName() also strips accents and collapses whitespace — for a simple
+// lowercase password .trim().toLowerCase() matches it.)
+const SAVE_THE_DATE_PASSWORD_PBKDF2 = {
+  saltHex: "4431dd5285a54e92e5000f2049fc0c1b",
+  iterations: 250000,
+  hashHex: "22630f762ee9610d9f34ff359e725f6df605704297d9a83494814dc0a06fd3c9",
+};
 
-async function sha256Hex(str) {
-  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
-  return [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, "0")).join("");
+function hexToBytes(hex) {
+  const out = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < out.length; i++) out[i] = parseInt(hex.substr(i * 2, 2), 16);
+  return out;
+}
+
+// Derives the PBKDF2 hash of an entered password (already normalized) and
+// compares it to the stored hash. Returns true on a match.
+async function verifyPassword(normalized, spec) {
+  const key = await crypto.subtle.importKey(
+    "raw", new TextEncoder().encode(normalized), "PBKDF2", false, ["deriveBits"]
+  );
+  const bits = await crypto.subtle.deriveBits(
+    { name: "PBKDF2", salt: hexToBytes(spec.saltHex), iterations: spec.iterations, hash: "SHA-256" },
+    key, 256
+  );
+  const got = [...new Uint8Array(bits)].map(b => b.toString(16).padStart(2, "0")).join("");
+  return got === spec.hashHex;
 }
 
 function daysUntilWedding() {
@@ -523,7 +548,7 @@ function render() {
         const entered = document.getElementById("login-password").value;
         // Normalized before hashing so a stray space or a phone keyboard's
         // auto-capitalization doesn't lock someone out.
-        if (await sha256Hex(normalizeName(entered)) !== SAVE_THE_DATE_PASSWORD_SHA256) {
+        if (!await verifyPassword(normalizeName(entered), SAVE_THE_DATE_PASSWORD_PBKDF2)) {
           state.loginError = "That password doesn't look right — check your save the date and try again.";
           render();
           return;
