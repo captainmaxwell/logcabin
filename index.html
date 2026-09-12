@@ -8,7 +8,7 @@
 <meta property="og:title" content="Jenny &amp; Max" />
 <meta property="og:description" content="Jenny &amp; Max are getting married May 1, 2027 in San Francisco. RSVP and find event details here." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cedarville+Cursive&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cedarville+Cursive&family=Playpen+Sans:wght@300..800&display=swap" rel="stylesheet">
 <style>
   :root {
     --cream: #FBF3E7;
@@ -38,15 +38,22 @@
     background-color: var(--cream);
     background-image: var(--grain);
     color: var(--plum);
-    font-family: 'Cedarville Cursive', cursive;
+    font-family: 'Playpen Sans', cursive;
     font-weight: 400;
   }
+  /* Two faces, with a strict split: Cedarville Cursive is a delicate script
+     that's lovely at display sizes and hard to read as body copy, so it is
+     used for headings ONLY — "Jenny & Max", section titles, event names.
+     Everything else (body, nav, forms, dates, venues) is Playpen Sans.
+     Cedarville ships a single weight (400), so the 700 below is synthesised
+     by the browser. */
+  .display, .ev-title { font-family: 'Cedarville Cursive', cursive; }
   .display { font-weight: 700; }
   .border-row { width: 100%; pointer-events: none; margin: 10px 0; }
   .border-row.bottom { transform: scaleY(-1); }
   .squiggle-strip { display:block; }
   h1, h2 { font-weight: 700; margin: 0; }
-  input, select, textarea, button { font-family: 'Cedarville Cursive', cursive; font-size: 15px; }
+  input, select, textarea, button { font-family: 'Playpen Sans', cursive; font-size: 15px; }
   .field {
     width: 100%; padding: 10px 14px; border: none;
     border-radius: 14px; background: white; color: var(--plum);
@@ -286,14 +293,14 @@ const REHEARSAL_DINNER = { day: "Friday", dateShort: "April 30, 2027", title: "R
 
 // The weekend as shown on the Events tab. In save-the-date mode only the
 // ceremony carries real details; Friday and Sunday are placeholders so the
-// shape of the weekend is visible without committing to specifics. Note the
-// Friday row deliberately carries NO title — the only Friday event is the
-// wedding-party rehearsal dinner, and naming it here would both leak the
+// shape of the weekend is visible without committing to specifics. Friday is
+// deliberately "Welcome" rather than "Rehearsal Dinner" — that's a
+// wedding-party-only event, and naming it on the public page would leak the
 // venue and imply every guest is invited.
 function weekendEvents(showRehearsal) {
   if (SAVE_THE_DATE_MODE) {
     return [
-      { day: "Friday", dateShort: "April 30, 2027", title: "", time: "", location: "", detail: "Details to come." },
+      { day: "Friday", dateShort: "April 30, 2027", title: "Welcome", time: "", location: "", detail: "Details to come." },
       CEREMONY,
       { day: "Sunday", dateShort: "May 2, 2027", title: "Farewell", time: "", location: "", detail: "Details to come." },
     ];
@@ -373,15 +380,11 @@ const TABS = SAVE_THE_DATE_MODE
 
 // One centred block per event: title, date, time, venue, description.
 function eventSectionHtml(ev) {
-  // An untitled event (the save-the-date Friday placeholder) promotes its day
-  // name into the title slot, so the date line below doesn't repeat it.
-  const heading = ev.title || ev.day;
-  const dateLine = ev.title ? `${ev.day}, ${ev.dateShort}` : ev.dateShort;
   // No time and no venue means nothing is pinned down yet.
   const tbd = !ev.time && !ev.location;
   return `<section class="ev ${tbd ? "tbd" : ""}">
-    <h3 class="ev-title">${heading}</h3>
-    <div class="ev-meta ev-date">${dateLine}</div>
+    <h3 class="ev-title">${ev.title}</h3>
+    <div class="ev-meta ev-date">${ev.day}, ${ev.dateShort}</div>
     ${ev.time ? `<div class="ev-meta">${ev.time}</div>` : ""}
     ${ev.location ? `<div class="ev-venue">${ev.location}</div>` : ""}
     ${ev.detail ? `<p class="ev-detail">${ev.detail}</p>` : ""}

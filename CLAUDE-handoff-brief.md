@@ -40,11 +40,21 @@ with and then abandoned.
   - Plum/near-black for text: `#3D2621`
   - Orange and yellow were explicitly tried and explicitly rejected — do not
     reintroduce them.
-- **Type — one font family everywhere:** Playpen Sans (Google Font), used at
-  different weights for hierarchy, not paired with a second family. This was a
-  deliberate simplification after an earlier draft mixed several font stacks
-  and it looked inconsistent. (Was Kalam until Sept 2026 — the one-font rule
-  is the decision worth keeping, not the specific face.)
+- **Type — two faces, with a strict split:**
+  - **Cedarville Cursive** for headings ONLY — "Jenny & Max", section titles,
+    event names (`.display` and `.ev-title`).
+  - **Playpen Sans** for everything else — body, nav, forms, dates, venues.
+
+  The split is not cosmetic. Cedarville's capitals are script forms: its `D`
+  reads as a lowercase `b` and its `L` as a flourished `ℒ`, so it is genuinely
+  misreadable in all-caps and poor as body copy — "SATURDAY" renders as
+  "SATUbAY". Keep it at display sizes in mixed case. It also ships a single
+  weight (400), so any bold on a heading is synthesised by the browser.
+
+  (History: a single family was the rule through Sept 2026 — Kalam, then
+  Playpen Sans — until the couple asked for a script for headings. What's
+  worth preserving is the discipline of a small, deliberate type system, not
+  the specific count.)
 - **Texture:** the cream background carries a subtle inline-SVG noise grain
   (`--grain` in `:root`), and the squiggle borders are generated from a
   *seeded* pseudo-random path so they look hand-drawn but don't twitch on
