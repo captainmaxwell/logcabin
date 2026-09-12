@@ -40,10 +40,15 @@ with and then abandoned.
   - Plum/near-black for text: `#3D2621`
   - Orange and yellow were explicitly tried and explicitly rejected — do not
     reintroduce them.
-- **Type — one font family everywhere:** Kalam (Google Font), used at
-  different weights (300/400/700) for hierarchy, not paired with a second
-  family. This was a deliberate simplification after an earlier draft mixed
-  several font stacks and it looked inconsistent.
+- **Type — one font family everywhere:** Playpen Sans (Google Font), used at
+  different weights for hierarchy, not paired with a second family. This was a
+  deliberate simplification after an earlier draft mixed several font stacks
+  and it looked inconsistent. (Was Kalam until Sept 2026 — the one-font rule
+  is the decision worth keeping, not the specific face.)
+- **Texture:** the cream background carries a subtle inline-SVG noise grain
+  (`--grain` in `:root`), and the squiggle borders are generated from a
+  *seeded* pseudo-random path so they look hand-drawn but don't twitch on
+  every re-render. Don't swap either for `Math.random()`.
 - **Motifs:** hand-drawn squiggle lines (SVG) as top/bottom borders instead
   of straight hairlines; a small hand-drawn Golden Gate Bridge illustration
   (SVG, sangria-colored line art) as a nod to the SF setting.
@@ -53,6 +58,29 @@ with and then abandoned.
   palette from an earlier design pass.
 - **Tone of copy:** casual and warm ("Let's go →", "are tying the knot!"),
   not formal invitation language.
+
+## Save-the-date mode
+
+`SAVE_THE_DATE_MODE` (a single const near the top of `index.html`) is the
+switch for "we've sent save the dates but not invitations yet." While it's
+`true`:
+
+- Login is a **single shared password** (`SAVE_THE_DATE_PASSWORD`) instead of
+  the per-guest name lookup. There's no guest object at all in this mode, so
+  anything rendering guest-specific content has to tolerate `state.guest`
+  being `null`. The guest list is never even fetched.
+- The **RSVP and Registry tabs are hidden** from the nav. None of that code is
+  deleted — the whole RSVP/plus-one flow and its Apps Script backend are
+  untouched and come straight back when the flag flips.
+- **Travel** shows a "details coming" line instead of the hotel block.
+- **Events** shows only the ceremony's real details; Friday and Sunday are
+  placeholder rows. The Friday row deliberately has no title, because the only
+  Friday event is the wedding-party rehearsal dinner and naming it would both
+  leak the venue and imply every guest is invited.
+
+The password is in client-side source, so it's a speed bump rather than real
+security — fine for a save-the-date, not for anything actually private. (The
+name-based login it replaces was no stronger.)
 
 ## Guest data model
 
