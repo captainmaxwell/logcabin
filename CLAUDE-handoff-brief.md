@@ -191,6 +191,13 @@ rediscovered from scratch:
 3. Google Sheets' native mobile app has no Apps Script editor and no
    "Publish to web" menu — that setup work needs a desktop browser (Chrome
    with "Desktop site" mode works if mobile-only is unavoidable).
+4. **Replacing an image? Give it a new filename.** Overwriting a file in
+   place leaves the URL byte-identical, so browsers that have already loaded
+   the page keep serving the cached copy and the change looks like it never
+   deployed. There's no build step here to hash filenames, so the filename is
+   the only cache key — name each photo for what it shows
+   (`jenny-max-bench.jpg`), not for the slot it fills
+   (`jenny-max-square.jpg`), and swapping photos busts the cache for free.
 
 ## Immediate next steps
 
