@@ -8,7 +8,7 @@
 <meta property="og:title" content="Jenny &amp; Max" />
 <meta property="og:description" content="Jenny &amp; Max are getting married May 1, 2027 in San Francisco. RSVP and find event details here." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playpen+Sans:wght@300..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cedarville+Cursive&display=swap" rel="stylesheet">
 <style>
   :root {
     --cream: #FBF3E7;
@@ -28,9 +28,9 @@
           cream keeps the mean exactly on-palette while varying lightness.
        Texture dial: `amp` is the slope, and each intercept is that channel's
        cream value minus amp/2. Measured texture (luminance sd) by amp:
-       0.12 -> 2.7, 0.20 -> 4.3, 0.30 -> 6.2, 0.45 -> 8.7 (too much).
+       0.12 -> 2.7, 0.16 -> 3.4, 0.20 -> 4.3, 0.30 -> 6.2, 0.45 -> 8.7.
        Past ~0.5 the highs clip to white and the mean starts sliding darker. */
-    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='0.2' intercept='0.8843'/%3E%3CfeFuncG type='linear' slope='0.2' intercept='0.8529'/%3E%3CfeFuncB type='linear' slope='0.2' intercept='0.8059'/%3E%3CfeFuncA type='discrete' tableValues='1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)'/%3E%3C/svg%3E");
+    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='0.16' intercept='0.9043'/%3E%3CfeFuncG type='linear' slope='0.16' intercept='0.8729'/%3E%3CfeFuncB type='linear' slope='0.16' intercept='0.8259'/%3E%3CfeFuncA type='discrete' tableValues='1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)'/%3E%3C/svg%3E");
   }
   * { box-sizing: border-box; }
   body {
@@ -38,7 +38,7 @@
     background-color: var(--cream);
     background-image: var(--grain);
     color: var(--plum);
-    font-family: 'Playpen Sans', cursive;
+    font-family: 'Cedarville Cursive', cursive;
     font-weight: 400;
   }
   .display { font-weight: 700; }
@@ -46,7 +46,7 @@
   .border-row.bottom { transform: scaleY(-1); }
   .squiggle-strip { display:block; }
   h1, h2 { font-weight: 700; margin: 0; }
-  input, select, textarea, button { font-family: 'Playpen Sans', cursive; font-size: 15px; }
+  input, select, textarea, button { font-family: 'Cedarville Cursive', cursive; font-size: 15px; }
   .field {
     width: 100%; padding: 10px 14px; border: none;
     border-radius: 14px; background: white; color: var(--plum);
@@ -107,16 +107,22 @@
     font-weight: 700; color: var(--sangria); line-height: 1.2;
     font-size: clamp(26px, 7.5vw, 36px); margin: 0 0 20px;
   }
-  /* Letter-spacing adds trailing space after the last glyph, which visually
-     shifts centred text left; the padding-left cancels it. */
+  /* The reference sets these lines in spaced small caps, but Cedarville
+     Cursive's capitals are script forms: its D reads as a b and its L as a
+     flourished script glyph, so "SATURDAY" renders as "SATUbAY" and "DETAILS"
+     as "bETAIℒS". These lines carry the dates and the venue, so they stay in
+     sentence case. Spacing is kept light for the same reason — the letterforms
+     are meant to connect, and wide tracking pulls them apart.
+     (Letter-spacing adds trailing space after the last glyph, which shifts
+     centred text visually left; the padding-left cancels it.) */
   .ev-meta, .ev-venue, .ev-detail {
-    text-transform: uppercase; letter-spacing: 0.14em; padding-left: 0.14em;
+    letter-spacing: 0.03em; padding-left: 0.03em;
   }
-  .ev-meta { font-size: 13px; line-height: 1.9; }
-  .ev-venue { font-size: 13px; margin-top: 16px; }
+  .ev-meta { font-size: 15px; line-height: 1.85; }
+  .ev-date { font-weight: 700; }
+  .ev-venue { font-size: 15px; margin-top: 16px; }
   .ev-detail {
-    font-size: 12.5px; line-height: 2.1; max-width: 56ch; margin: 20px auto 0;
-    letter-spacing: 0.1em; padding-left: 0.1em;
+    font-size: 14px; line-height: 1.95; max-width: 52ch; margin: 18px auto 0;
   }
   .ev.tbd .ev-detail { opacity: 0.7; }
   .knot-divider { display: block; margin: 42px auto; width: min(230px, 58%); height: auto; }
@@ -263,17 +269,18 @@ function daysUntilWedding() {
 }
 
 const VENUE_MAP_LINK = "https://maps.app.goo.gl/AMKeBu3wMF5qSejb8";
-const VENUE_MAP_HTML = `<br><a href="${VENUE_MAP_LINK}" target="_blank" rel="noopener" style="color:var(--sangria); font-weight:700;">View on Google Maps &rarr;</a>`;
+const VENUE_MAP_ANCHOR = `<a href="${VENUE_MAP_LINK}" target="_blank" rel="noopener" style="color:var(--sangria); font-weight:700;">View on Google Maps &rarr;</a>`;
+const VENUE_MAP_HTML = `<br>${VENUE_MAP_ANCHOR}`;
 const ZAZIE_MAP_LINK = "https://maps.app.goo.gl/fG2AjyfbZRH15Bbj7";
 const ZAZIE_MAP_HTML = `<br><a href="${ZAZIE_MAP_LINK}" target="_blank" rel="noopener" style="color:var(--sangria); font-weight:700;">View on Google Maps &rarr;</a>`;
 
-const CEREMONY = { id: "ceremony-reception", day: "Saturday", dateShort: "May 1, 2027", title: "Ceremony &amp; Reception", date: "Saturday, May 1, 2027", time: "4:00 PM &ndash; 10:00 PM", location: "The Log Cabin, Presidio", detail: `An outdoor ceremony under the eucalyptus, fog permitting, followed by dinner, toasts, and dancing at the Log Cabin, with the Golden Gate Bridge as our backdrop. Seating starts at 3:30.${VENUE_MAP_HTML}` };
+const CEREMONY = { id: "ceremony-reception", day: "Saturday", dateShort: "May 1, 2027", title: "Ceremony &amp; Reception", date: "Saturday, May 1, 2027", time: "4:00 PM &ndash; 10:00 PM", location: "The Log Cabin, Presidio", detail: VENUE_MAP_ANCHOR };
 
 const PUBLIC_EVENTS = [
   CEREMONY,
   SAVE_THE_DATE_MODE
-    ? { id: "brunch", day: "Sunday", dateShort: "May 2, 2027", title: "Farewell Brunch", date: "Sunday, May 2, 2027", time: "Time TBD", location: "Location TBD", detail: "One more meal together before everyone heads home — details coming soon!" }
-    : { id: "brunch", day: "Sunday", dateShort: "May 2, 2027", title: "Farewell Brunch", date: "Sunday, May 2, 2027", time: "10:00 AM", location: "Zazie", detail: `One more meal together before everyone heads home — hope you can join us!${ZAZIE_MAP_HTML}` },
+    ? { id: "brunch", day: "Sunday", dateShort: "May 2, 2027", title: "Farewell", date: "Sunday, May 2, 2027", time: "Time TBD", location: "Location TBD", detail: "One more meal together before everyone heads home — details coming soon!" }
+    : { id: "brunch", day: "Sunday", dateShort: "May 2, 2027", title: "Farewell", date: "Sunday, May 2, 2027", time: "10:00 AM", location: "Zazie", detail: `One more meal together before everyone heads home — hope you can join us!${ZAZIE_MAP_HTML}` },
 ];
 const REHEARSAL_DINNER = { day: "Friday", dateShort: "April 30, 2027", title: "Rehearsal Dinner", date: "Friday, April 30, 2027", time: "7:00 PM", location: "Liholiho Yacht Club", detail: "Wedding party and partners. Casual dress, no speeches — we promise." };
 
@@ -288,7 +295,7 @@ function weekendEvents(showRehearsal) {
     return [
       { day: "Friday", dateShort: "April 30, 2027", title: "", time: "", location: "", detail: "Details to come." },
       CEREMONY,
-      { day: "Sunday", dateShort: "May 2, 2027", title: "Farewell Brunch", time: "", location: "", detail: "Details to come." },
+      { day: "Sunday", dateShort: "May 2, 2027", title: "Farewell", time: "", location: "", detail: "Details to come." },
     ];
   }
   return [
@@ -359,7 +366,7 @@ const ALL_TABS = [
 // save-the-date mode is on — their render logic and the whole RSVP/plus-one
 // backend path further down are untouched, so flipping SAVE_THE_DATE_MODE to
 // false brings them straight back.
-const HIDDEN_IN_SAVE_THE_DATE = ["registry", "rsvp"];
+const HIDDEN_IN_SAVE_THE_DATE = ["registry", "rsvp", "faq"];
 const TABS = SAVE_THE_DATE_MODE
   ? ALL_TABS.filter(t => !HIDDEN_IN_SAVE_THE_DATE.includes(t.id))
   : ALL_TABS;
@@ -374,7 +381,7 @@ function eventSectionHtml(ev) {
   const tbd = !ev.time && !ev.location;
   return `<section class="ev ${tbd ? "tbd" : ""}">
     <h3 class="ev-title">${heading}</h3>
-    <div class="ev-meta">${dateLine}</div>
+    <div class="ev-meta ev-date">${dateLine}</div>
     ${ev.time ? `<div class="ev-meta">${ev.time}</div>` : ""}
     ${ev.location ? `<div class="ev-venue">${ev.location}</div>` : ""}
     ${ev.detail ? `<p class="ev-detail">${ev.detail}</p>` : ""}
