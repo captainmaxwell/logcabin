@@ -15,12 +15,21 @@
     --sangria: #B9343E;
     --plum: #3D2621;
     --forest: #355E3B;
-    /* Subtle paper grain: an inline SVG noise tile, desaturated to grey and
-       laid over the cream at low opacity so it reads as texture, not colour.
-       stitchTiles='stitch' makes the 160px tile repeat seamlessly. Inline so
-       it costs no extra request and can't fail to load.
-       To dial it: baseFrequency down = coarser/more visible, opacity up = stronger. */
-    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23g)' opacity='0.1'/%3E%3C/svg%3E");
+    /* Paper grain: an inline SVG noise tile so the background reads like card
+       stock rather than flat colour. Inline, so it costs no extra request and
+       can't fail to load; stitchTiles='stitch' repeats the 180px tile seamlessly.
+       Two details here are load-bearing, both learned the hard way:
+       1. color-interpolation-filters='sRGB'. SVG filters default to linearRGB,
+          which reads these sRGB values as linear and washes the cream out
+          (measured: 14.5 RGB drift, warmth R-B falling 20 -> 9).
+       2. The transfer centres the noise on the CREAM, not on mid-grey:
+          out = amp*L + (cream_channel - amp/2). Grey noise laid over cream
+          desaturates it toward dust (measured: 34 RGB drift). Centring on the
+          cream keeps the mean exactly on-palette while varying lightness.
+       Texture dial: raise `amp` (slope, and subtract amp/2 in each intercept).
+       At 0.45 the drift is 3.3 RGB with texture sd 8.65. Past ~0.5 the highs
+       clip to white and the mean starts sliding darker. */
+    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='0.45' intercept='0.7593'/%3E%3CfeFuncG type='linear' slope='0.45' intercept='0.7279'/%3E%3CfeFuncB type='linear' slope='0.45' intercept='0.6809'/%3E%3CfeFuncA type='discrete' tableValues='1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)'/%3E%3C/svg%3E");
   }
   * { box-sizing: border-box; }
   body {
