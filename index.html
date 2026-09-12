@@ -102,7 +102,7 @@
     width: 150px; height: 150px; border-radius: 50%; object-fit: cover;
     display: block; margin: 4px auto 14px;
   }
-  .countdown { font-size: 13px; color: var(--sangria); font-weight: 700; margin-bottom: 4px; }
+  .countdown { font-size: 13px; color: var(--forest); font-weight: 700; margin-bottom: 4px; }
   .story-flex { display: flex; gap: 28px; flex-wrap: wrap; align-items: flex-start; max-width: 900px; }
   .story-flex p { flex: 1 1 320px; max-width: 60ch; line-height: 1.6; margin: 0; }
   .story-photo {
@@ -516,7 +516,6 @@ function render() {
         <div class="border-row top">${squiggleSvg()}</div>
         <div style="flex:1; display:flex; align-items:center; justify-content:center; padding:24px;">
           <div style="text-align:center; max-width:400px; width:100%;">
-            <div style="display:inline-block; border:2.5px solid var(--sangria); color:var(--sangria); padding:6px 20px; border-radius:999px; font-size:12px; font-weight:700; letter-spacing:0.08em; margin-bottom:22px;">YOU'RE INVITED</div>
             <h1 class="display" style="font-size:clamp(38px, 12vw, 60px); color:var(--sangria);">Jenny &amp; Max</h1>
             <img class="photo-circle" src="photos/jenny-max-square.jpg" alt="Jenny and Max" />
             <div class="countdown">${daysUntilWedding()} days to go</div>
@@ -532,9 +531,6 @@ function render() {
             <div style="display:flex; justify-content:center; gap:20px; margin-top:18px;">
               <img class="mascot-inline" src="photos/lav.png" alt="Lav" />
               <img class="mascot-inline" src="photos/lenny.png" alt="Lenny" />
-            </div>
-            <div style="margin-top:14px;">
-              <a href="#" id="admin-link" style="font-size:12px; opacity:0.5; color:var(--plum);">Wedding admin</a>
             </div>
           </div>
         </div>
@@ -600,11 +596,6 @@ function render() {
       state.view = "site";
       render();
     });
-    document.getElementById("admin-link").addEventListener("click", (e) => {
-      e.preventDefault();
-      state.view = "admin-login";
-      render();
-    });
     return;
   }
 
@@ -639,7 +630,7 @@ function render() {
       }
     });
     document.getElementById("back-link").addEventListener("click", (e) => {
-      e.preventDefault(); state.view = "login"; render();
+      e.preventDefault(); leaveAdmin(); render();
     });
     return;
   }
@@ -692,7 +683,7 @@ function render() {
     document.getElementById("export-btn").addEventListener("click", () => {
       downloadCsv(rowsToCsv(state.adminRows || []), "jenny-max-rsvps.csv");
     });
-    document.getElementById("back-link2").addEventListener("click", (e) => { e.preventDefault(); state.view = "login"; render(); });
+    document.getElementById("back-link2").addEventListener("click", (e) => { e.preventDefault(); leaveAdmin(); render(); });
     return;
   }
 
@@ -977,6 +968,26 @@ async function refreshAdminRows() {
   render();
 }
 
+// The admin dashboard has no link on the login page — it's reached by URL:
+//   https://<site>/#admin
+// The passcode is still checked server-side in the Apps Script, so the hash
+// isn't what protects anything; it just keeps a door guests have no use for
+// out of their way.
+function applyAdminHash() {
+  if (location.hash.toLowerCase() === "#admin" && state.view === "login") {
+    state.view = "admin-login";
+  }
+}
+// Drop the #admin off the URL on the way out, so a later refresh lands on the
+// guest login rather than bouncing straight back into the admin view.
+function leaveAdmin() {
+  state.view = "login";
+  if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+}
+// Covers pasting the URL into an already-open tab, where there's no reload.
+window.addEventListener("hashchange", () => { applyAdminHash(); render(); });
+
+applyAdminHash();
 render();
 </script>
 </body>
