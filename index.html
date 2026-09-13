@@ -348,7 +348,7 @@ const VENUE_MAP_HTML = `<br>${VENUE_MAP_ANCHOR}`;
 
 const CEREMONY = { doodles: [{ file: "rings.svg", tilt: "tilt-b" }, { file: "cake.svg", tilt: "tilt-c" }], id: "ceremony-reception", day: "Saturday", dateShort: "May 1, 2027", title: "Ceremony &amp; Reception", date: "Saturday, May 1, 2027", time: "4:00 PM &ndash; 10:00 PM", location: "The Log Cabin, Presidio", detail: `The ceremony will be outside with the Golden Gate Bridge in view (fog permitting) &mdash; then we'll move inside for drinks, dinner, and dancing!${VENUE_MAP_HTML}` };
 
-const FAREWELL_BREAKFAST = { doodle: "flowers.svg", tilt: "tilt-c", id: "brunch", day: "Sunday", dateShort: "May 2, 2027", title: "Farewell Breakfast", date: "Sunday, May 2, 2027", time: "", location: "", detail: "Casual meetup for those who stick around Sunday &mdash; details TBD!" };
+const FAREWELL_BREAKFAST = { doodle: "flowers.svg", tilt: "tilt-c", id: "brunch", day: "Sunday", dateShort: "May 2, 2027", title: "Farewell Breakfast", date: "Sunday, May 2, 2027", time: "", location: "", detail: "Casual meetup for those who stick around Sunday &mdash; we'll share details closer to the date." };
 
 const PUBLIC_EVENTS = [CEREMONY, FAREWELL_BREAKFAST];
 const REHEARSAL_DINNER = { doodle: "champagne.svg", tilt: "tilt-a", day: "Friday", dateShort: "April 30, 2027", title: "Rehearsal Dinner", date: "Friday, April 30, 2027", time: "Time TBD", location: "Location TBD", detail: "We're still finalizing plans for the wedding party dinner &mdash; details coming soon!" };
@@ -362,7 +362,7 @@ const REHEARSAL_DINNER = { doodle: "champagne.svg", tilt: "tilt-a", day: "Friday
 function weekendEvents(showRehearsal) {
   if (SAVE_THE_DATE_MODE) {
     return [
-      { doodle: "champagne.svg", tilt: "tilt-a", day: "Friday", dateShort: "April 30, 2027", title: "Welcome Drinks", time: "", location: "", detail: "Details to come." },
+      { doodle: "champagne.svg", tilt: "tilt-a", day: "Friday", dateShort: "April 30, 2027", title: "Welcome Drinks", time: "", location: "", detail: "We'll share details closer to the date." },
       CEREMONY,
       FAREWELL_BREAKFAST,
     ];
