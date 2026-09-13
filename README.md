@@ -10,7 +10,8 @@ Wedding website for Jenny & Max. San Francisco, at The Log Cabin in the Presidio
 |---|---|
 | `index.html` | The entire site — HTML, CSS and JS in one file. No build step, no framework. |
 | `apps-script/Code.gs` | The backend. A Google Apps Script Web App, bound to a Google Sheet that holds the guest list and RSVPs. |
-| `photos/` | Images the live site loads. |
+| `photos/` | Photographs the live site loads. |
+| `doodles/` | Hand-drawn line-art SVGs used as accents. Pre-coloured sangria — see CLAUDE.md before changing the palette. |
 | `originals/` | Raw uploads the images in `photos/` were cropped from. Not loaded by the site. |
 | `CLAUDE.md` | The full project brief — design decisions, data model, and the traps worth knowing before changing anything. |
 

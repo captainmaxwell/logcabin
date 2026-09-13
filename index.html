@@ -143,7 +143,24 @@
     font-size: 14px; line-height: 1.95; max-width: 52ch; margin: 18px auto 0;
   }
   .ev.tbd .ev-detail { opacity: 0.7; }
-  .knot-divider { display: block; margin: 42px auto; width: min(230px, 58%); height: auto; }
+  .knot-divider { display: block; margin: 42px auto; width: min(150px, 44%); height: auto; }
+  /* Hand-drawn doodles from doodles/, loaded as <img>. They ship already
+     coloured #B9343E — the same sangria as the palette — so they need no
+     recolouring, but that also means a palette change requires re-exporting
+     them rather than editing a variable. The knot is the exception: it's
+     inlined so its fill can follow var(--sangria).
+     Rotations are fixed per-doodle rather than random, so they look
+     hand-placed but don't jump around on re-render. */
+  .doodle { display: block; height: auto; opacity: 0.95; }
+  .doodle-center { margin-left: auto; margin-right: auto; }
+  .ev-doodle { width: 44px; margin: 0 auto 10px; }
+  .ev-doodle.tilt-a { transform: rotate(-7deg); }
+  .ev-doodle.tilt-b { transform: rotate(5deg); }
+  .ev-doodle.tilt-c { transform: rotate(-4deg); }
+  .doodle-cabin { width: min(280px, 78%); margin: 0 auto 30px; transform: rotate(-1.5deg); }
+  .doodle-train { width: min(260px, 70%); margin: 26px auto 0; transform: rotate(2deg); }
+  .doodle-puppies { width: min(190px, 52%); margin: 30px auto 0; transform: rotate(-3deg); }
+  .doodle-flowers { width: 42px; margin: 0 auto 10px; transform: rotate(6deg); }
   .party-table { border-top: 1.5px solid var(--plum); }
   .party-row {
     padding: 14px 0; border-bottom: 1.5px solid var(--plum);
@@ -228,14 +245,13 @@ function squiggleSvg() {
 }
 
 // The hand-drawn knot that separates events. Path copied from
-// photos/Knot divider.svg (kept in the repo as the source of truth) and
-// inlined here so the fill can be var(--sangria): the file ships with a
-// hardcoded #C30000, and an <img> can't be recoloured from CSS, which would
-// have put a second, slightly-off red on the page.
-const KNOT_PATH = "M229.533 0C235.248 0.520983 239.513 2.7625 242.453 7.85367C244.365 11.1608 243.959 14.4001 243.785 18.0389C244.684 18.1511 245.715 18.1845 246.625 18.1857C257.497 18.1995 268.392 18.2826 279.257 17.9472C280.992 17.8935 283.104 17.44 284.875 17.2653C294.163 16.4174 303.42 15.2644 312.632 13.808C322.23 12.2694 332.674 10.0338 342.334 9.31299C368.039 7.39548 396.011 6.80478 420.272 16.7347C423.582 18.0892 426.684 17.9543 429.223 20.741C429.395 21.8627 429.419 23.0052 429.467 24.1398C429.187 24.442 428.371 25.2643 428.08 25.4556C424.209 28.0034 413.136 22.5505 408.709 21.1352C405.304 20.0781 401.841 19.2191 398.338 18.5622C383.155 15.6863 365.958 15.7546 350.525 16.5103C338.143 17.1165 325.672 19.8274 313.46 21.7421C305.287 22.9994 297.082 24.0507 288.853 24.8945C285.861 25.2271 282.489 25.8235 279.436 25.9611C266.673 26.5365 253.619 25.5535 240.907 26.4178C239.172 26.5358 235.501 31.6272 234.041 33.1763C232.881 34.4228 231.587 35.5388 230.184 36.5051C223.765 40.8692 214.97 40.6706 207.594 39.2693C201.962 37.8539 200.26 35.7215 195.852 32.6818C193.209 32.9375 190.451 33.5834 187.775 33.7758C183.822 34.2784 179.589 33.8023 175.668 34.0389C165.858 34.7788 156.644 32.2728 147.01 31.4416C132.548 30.1946 117.559 30.7901 103.032 30.7662C88.6731 31.089 75.3449 35.6706 60.959 36.003C43.2096 36.4132 25.4929 37.2197 7.73203 36.566C5.26823 36.4753 0.241121 35.0964 0.0213263 32.1603C-0.447855 25.898 6.94425 28.5762 10.3858 28.8219C24.1183 28.8479 37.6615 29.0829 51.3625 28.1715C55.4837 27.8974 59.8199 28.146 63.9142 27.8587C74.6089 27.1086 84.9044 24.023 95.5748 23.0636C100.592 22.6406 106.282 22.8354 111.359 22.8342L136.815 22.8612C146.828 22.8965 155.733 24.5232 165.62 25.8133C170.763 26.4844 177.715 25.5977 183.026 25.9553C185.812 26.143 189.12 25.6406 191.845 25.0643C191.858 19.1377 191.296 6.4366 199.093 5.14775C205.119 4.15187 210.911 5.52548 216.39 7.93938C220.889 4.40615 223.111 0.49639 229.533 0ZM219.946 31.9419C224.707 31.4287 227.688 28.3991 230.578 24.8331C230.69 24.6951 230.797 24.5547 230.905 24.4124C228.557 23.7339 227.039 23.295 224.807 22.3767C223.335 21.7703 218.856 19.3695 217.691 19.1226C216.049 20.6734 214.211 23.158 212.455 24.968C210.162 27.3323 208.632 28.3024 206.238 30.3963C211.367 32.358 214.5 32.0116 219.946 31.9419ZM206.119 19.8788C207.84 18.1425 209.708 16.3689 210.928 14.243C207.148 12.9699 205.272 12.9565 201.348 13.0532C200.03 14.6969 199.275 22.0384 200.249 23.4598C202.119 23.9308 204.914 21.1597 206.119 19.8788ZM223.201 12.6077C226.38 14.4447 227.86 15.0524 231.373 16.2173C232.478 16.5323 233.924 17.0127 235.038 17.0143C235.523 16.6867 236.103 16.2909 236.122 15.6302C236.243 11.3038 233.423 8.45272 229.296 8.31997C226.807 8.98135 225.072 10.8499 223.201 12.6077Z";
+// originals/knot-small.svg and inlined rather than loaded as a file, so the
+// fill stays var(--sangria) — the one doodle tied to the palette variable.
+// The others in doodles/ are <img>-loaded; see the note there.
+const KNOT_PATH = "M86.0602 0C91.7758 0.520981 96.041 2.7624 98.9811 7.85352C100.893 11.1606 100.487 14.4003 100.313 18.0391C101.213 18.1512 102.244 18.1844 103.153 18.1855C114.025 18.1994 115.92 18.2827 126.785 17.9473C128.52 17.8935 130.632 17.4404 132.403 17.2656C137.795 16.7734 141.027 16 146.027 16.5C147.507 16.648 148.91 17.0178 150.027 18C150.76 18.6448 150.742 18.7931 151.027 20C151.312 21.2069 149.172 22.03 147.527 22.5C144.027 23.5 141.244 23.3959 136.382 23.8945C133.389 24.2271 130.089 25.0391 126.527 25.5C113.764 26.0754 110.147 25.5536 97.4342 26.418C95.6993 26.5365 92.0297 31.6263 90.569 33.1758C89.4093 34.4223 88.1156 35.5387 86.7125 36.5049C80.2929 40.869 71.4983 40.6708 64.1217 39.2695C58.4897 37.8542 56.7887 35.7213 52.3805 32.6816C49.7376 32.9373 46.9792 33.5829 44.3034 33.7754C40.3506 34.278 36.1171 33.8025 32.196 34.0391C22.3867 34.779 13.1726 32.2726 3.53776 31.4414C2.44949 31.3476 1.38584 30.9518 0.526906 30C-0.308072 29.0747 0.0462244 28.6914 0.264551 28C1.52761 24 14.5938 24.8279 22.1481 25.8135C27.2906 26.4846 34.2428 25.5975 39.5534 25.9551C42.3398 26.1427 45.6486 25.6408 48.3737 25.0645C48.3866 19.1379 47.8238 6.43661 55.6208 5.14746C61.6466 4.15158 67.4393 5.52555 72.9186 7.93945C77.4169 4.40633 79.6386 0.496524 86.0602 0ZM74.2194 19.123C72.5775 20.6738 70.7395 23.1577 68.9831 24.9678C66.6897 27.332 65.1599 28.3025 62.7663 30.3965C67.8948 32.3581 71.0284 32.0111 76.4743 31.9414C81.2352 31.4283 84.2161 28.3989 87.1061 24.833C87.2182 24.6951 87.3259 24.5544 87.4333 24.4121C85.085 23.7336 83.5668 23.2952 81.3356 22.377C79.8634 21.7706 75.3848 19.3705 74.2194 19.123ZM67.4557 14.2432C63.6756 12.9701 61.7998 12.957 57.8766 13.0537C56.5582 14.6977 55.8031 22.0386 56.777 23.46C58.6475 23.9306 61.442 21.1598 62.6471 19.8789C64.3677 18.1427 66.2362 16.3691 67.4557 14.2432ZM85.8249 8.32031C83.3358 8.98168 81.6001 10.8497 79.7291 12.6074C82.9079 14.4445 84.3881 15.0528 87.901 16.2178C89.0058 16.5327 90.4518 17.0129 91.5661 17.0146C92.0505 16.6871 92.631 16.2905 92.65 15.6299C92.7716 11.3038 89.9507 8.45327 85.8249 8.32031Z";
 
 function knotDividerSvg() {
-  return `<svg class="knot-divider" viewBox="0 0 430 41" aria-hidden="true" focusable="false">
+  return `<svg class="knot-divider" viewBox="0 0 152 41" aria-hidden="true" focusable="false">
     <path d="${KNOT_PATH}" fill="var(--sangria)"/>
   </svg>`;
 }
@@ -317,15 +333,15 @@ const VENUE_MAP_HTML = `<br>${VENUE_MAP_ANCHOR}`;
 const ZAZIE_MAP_LINK = "https://maps.app.goo.gl/fG2AjyfbZRH15Bbj7";
 const ZAZIE_MAP_HTML = `<br><a href="${ZAZIE_MAP_LINK}" target="_blank" rel="noopener" style="color:var(--sangria); font-weight:700;">View on Google Maps &rarr;</a>`;
 
-const CEREMONY = { id: "ceremony-reception", day: "Saturday", dateShort: "May 1, 2027", title: "Ceremony &amp; Reception", date: "Saturday, May 1, 2027", time: "4:00 PM &ndash; 10:00 PM", location: "The Log Cabin, Presidio", detail: VENUE_MAP_ANCHOR };
+const CEREMONY = { doodle: "rings.svg", tilt: "tilt-b", id: "ceremony-reception", day: "Saturday", dateShort: "May 1, 2027", title: "Ceremony &amp; Reception", date: "Saturday, May 1, 2027", time: "4:00 PM &ndash; 10:00 PM", location: "The Log Cabin, Presidio", detail: VENUE_MAP_ANCHOR };
 
 const PUBLIC_EVENTS = [
   CEREMONY,
   SAVE_THE_DATE_MODE
-    ? { id: "brunch", day: "Sunday", dateShort: "May 2, 2027", title: "Farewell", date: "Sunday, May 2, 2027", time: "Time TBD", location: "Location TBD", detail: "One more meal together before everyone heads home — details coming soon!" }
-    : { id: "brunch", day: "Sunday", dateShort: "May 2, 2027", title: "Farewell", date: "Sunday, May 2, 2027", time: "10:00 AM", location: "Zazie", detail: `One more meal together before everyone heads home — hope you can join us!${ZAZIE_MAP_HTML}` },
+    ? { doodle: "cake.svg", tilt: "tilt-c", id: "brunch", day: "Sunday", dateShort: "May 2, 2027", title: "Farewell", date: "Sunday, May 2, 2027", time: "Time TBD", location: "Location TBD", detail: "One more meal together before everyone heads home — details coming soon!" }
+    : { doodle: "cake.svg", tilt: "tilt-c", id: "brunch", day: "Sunday", dateShort: "May 2, 2027", title: "Farewell", date: "Sunday, May 2, 2027", time: "10:00 AM", location: "Zazie", detail: `One more meal together before everyone heads home — hope you can join us!${ZAZIE_MAP_HTML}` },
 ];
-const REHEARSAL_DINNER = { day: "Friday", dateShort: "April 30, 2027", title: "Rehearsal Dinner", date: "Friday, April 30, 2027", time: "7:00 PM", location: "Liholiho Yacht Club", detail: "Wedding party and partners. Casual dress, no speeches — we promise." };
+const REHEARSAL_DINNER = { doodle: "champagne.svg", tilt: "tilt-a", day: "Friday", dateShort: "April 30, 2027", title: "Rehearsal Dinner", date: "Friday, April 30, 2027", time: "7:00 PM", location: "Liholiho Yacht Club", detail: "Wedding party and partners. Casual dress, no speeches — we promise." };
 
 // The weekend as shown on the Events tab. In save-the-date mode only the
 // ceremony carries real details; Friday and Sunday are placeholders so the
@@ -336,9 +352,9 @@ const REHEARSAL_DINNER = { day: "Friday", dateShort: "April 30, 2027", title: "R
 function weekendEvents(showRehearsal) {
   if (SAVE_THE_DATE_MODE) {
     return [
-      { day: "Friday", dateShort: "April 30, 2027", title: "Welcome", time: "", location: "", detail: "Details to come." },
+      { doodle: "champagne.svg", tilt: "tilt-a", day: "Friday", dateShort: "April 30, 2027", title: "Welcome", time: "", location: "", detail: "Details to come." },
       CEREMONY,
-      { day: "Sunday", dateShort: "May 2, 2027", title: "Farewell", time: "", location: "", detail: "Details to come." },
+      { doodle: "cake.svg", tilt: "tilt-c", day: "Sunday", dateShort: "May 2, 2027", title: "Farewell", time: "", location: "", detail: "Details to come." },
     ];
   }
   return [
@@ -433,6 +449,7 @@ function eventSectionHtml(ev) {
   // No time and no venue means nothing is pinned down yet.
   const tbd = !ev.time && !ev.location;
   return `<section class="ev ${tbd ? "tbd" : ""}">
+    ${ev.doodle ? `<img class="doodle ev-doodle ${ev.tilt || ""}" src="doodles/${ev.doodle}" alt="" aria-hidden="true" />` : ""}
     <h3 class="ev-title">${ev.title}</h3>
     <div class="ev-meta ev-date">${ev.day}, ${ev.dateShort}</div>
     ${ev.time ? `<div class="ev-meta">${ev.time}</div>` : ""}
@@ -537,6 +554,7 @@ function render() {
         <div class="border-row top">${squiggleSvg()}</div>
         <div style="flex:1; display:flex; align-items:center; justify-content:center; padding:24px;">
           <div style="text-align:center; max-width:400px; width:100%;">
+            <img class="doodle doodle-flowers" src="doodles/flowers.svg" alt="" aria-hidden="true" />
             <h1 class="display" style="font-size:clamp(38px, 12vw, 60px); color:var(--sangria);">Jenny &amp; Max</h1>
             <img class="photo-circle" src="photos/jenny-max-bench.jpg" alt="Jenny and Max" />
             <div class="countdown">${daysUntilWedding()} days to go</div>
@@ -720,9 +738,11 @@ function render() {
     // this tab is about half a megabyte of images.
     tabHtml = `<div class="gallery">
         ${GALLERY.map(p => `<img src="photos/${p.file}" alt="${escapeHtml(p.alt)}" loading="lazy" />`).join("")}
-      </div>`;
+      </div>
+      <img class="doodle doodle-puppies doodle-center" src="doodles/puppies.svg" alt="Lav and Lenny" />`;
   } else if (state.activeTab === "events") {
     tabHtml = `<div class="events-page">
+        <img class="doodle doodle-cabin doodle-center" src="doodles/cabin-bridge.svg" alt="The Log Cabin in the Presidio, with the Golden Gate Bridge" />
         ${weekendEvents(showRehearsal).map(eventSectionHtml).join(knotDividerSvg())}
         ${!SAVE_THE_DATE_MODE && g && g.isWeddingParty && state.rsvp.status !== "yes" ? `<p class="ev-detail" style="margin-top:34px;">Rehearsal dinner details will appear here once you RSVP yes.</p>` : ""}
       </div>`;
@@ -845,12 +865,14 @@ function render() {
   } else if (state.activeTab === "lodging") {
     tabHtml = SAVE_THE_DATE_MODE
       ? `<h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Lodging</h2>
-      <p style="max-width:55ch; line-height:1.6;">We're still sorting out lodging options — we'll let you know as soon as we have more details to share.</p>`
+      <p style="max-width:55ch; line-height:1.6;">We're still sorting out lodging options — we'll let you know as soon as we have more details to share.</p>
+      <img class="doodle doodle-train" src="doodles/f-train.svg" alt="An F-line streetcar" />`
       : `<h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Lodging</h2>
       <p style="max-width:55ch; line-height:1.6; margin-bottom:16px;">Fly into SFO or OAK. Both venues are a short rideshare from downtown; parking is limited at the Presidio, so carpooling or rideshare is easiest.</p>
       <div class="cards-grid">
         ${eventCardHtml({ title: "The Argonaut Hotel", date: "Room block rate &amp; booking deadline: TBD", time: "", location: "Fisherman's Wharf, San Francisco", detail: `We've picked out the Argonaut for our room block — a nautical-themed hotel right on Fisherman's Wharf. Rate and booking link coming soon.<br><a href="https://maps.app.goo.gl/aZDg99RFGRjBZwgB7" target="_blank" rel="noopener" style="color:var(--sangria); font-weight:700;">View on Google Maps &rarr;</a>` }, false)}
-      </div>`;
+      </div>
+      <img class="doodle doodle-train" src="doodles/f-train.svg" alt="An F-line streetcar" />`;
   } else if (state.activeTab === "registry") {
     tabHtml = `<h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Registry</h2>
       <p style="max-width:55ch; line-height:1.6;">Your presence is the gift. If you'd like to give something, we've set up registries here — replace with real links when ready.</p>`;
