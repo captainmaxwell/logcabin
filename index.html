@@ -332,12 +332,12 @@ const VENUE_MAP_HTML = `<br>${VENUE_MAP_ANCHOR}`;
 const ZAZIE_MAP_LINK = "https://maps.app.goo.gl/fG2AjyfbZRH15Bbj7";
 const ZAZIE_MAP_HTML = `<br><a href="${ZAZIE_MAP_LINK}" target="_blank" rel="noopener" style="color:var(--sangria); font-weight:700;">View on Google Maps &rarr;</a>`;
 
-const CEREMONY = { doodles: [{ file: "rings.svg", tilt: "tilt-b" }, { file: "cake.svg", tilt: "tilt-c" }], id: "ceremony-reception", day: "Saturday", dateShort: "May 1, 2027", title: "Ceremony &amp; Reception", date: "Saturday, May 1, 2027", time: "4:00 PM &ndash; 10:00 PM", location: "The Log Cabin, Presidio", detail: VENUE_MAP_ANCHOR };
+const CEREMONY = { doodles: [{ file: "rings.svg", tilt: "tilt-b" }, { file: "cake.svg", tilt: "tilt-c" }], id: "ceremony-reception", day: "Saturday", dateShort: "May 1, 2027", title: "Ceremony &amp; Reception", date: "Saturday, May 1, 2027", time: "4:00 PM &ndash; 10:00 PM", location: "The Log Cabin, Presidio", detail: `The ceremony will be outside with the Golden Gate Bridge in view (fog permitting!) &mdash; then we'll move inside for drinks, dinner, speeches, and dancing.${VENUE_MAP_HTML}` };
 
 const PUBLIC_EVENTS = [
   CEREMONY,
   SAVE_THE_DATE_MODE
-    ? { doodle: "flowers.svg", tilt: "tilt-c", id: "brunch", day: "Sunday", dateShort: "May 2, 2027", title: "Farewell", date: "Sunday, May 2, 2027", time: "Time TBD", location: "Location TBD", detail: "One more meal together before everyone heads home — details coming soon!" }
+    ? { doodle: "flowers.svg", tilt: "tilt-c", id: "brunch", day: "Sunday", dateShort: "May 2, 2027", title: "Farewell Breakfast", date: "Sunday, May 2, 2027", time: "Time TBD", location: "Location TBD", detail: "Casual final meetup for those who stick around Sunday &mdash; details TBD!" }
     : { doodle: "flowers.svg", tilt: "tilt-c", id: "brunch", day: "Sunday", dateShort: "May 2, 2027", title: "Farewell", date: "Sunday, May 2, 2027", time: "10:00 AM", location: "Zazie", detail: `One more meal together before everyone heads home — hope you can join us!${ZAZIE_MAP_HTML}` },
 ];
 const REHEARSAL_DINNER = { doodle: "champagne.svg", tilt: "tilt-a", day: "Friday", dateShort: "April 30, 2027", title: "Rehearsal Dinner", date: "Friday, April 30, 2027", time: "7:00 PM", location: "Liholiho Yacht Club", detail: "Wedding party and partners. Casual dress, no speeches — we promise." };
@@ -353,7 +353,7 @@ function weekendEvents(showRehearsal) {
     return [
       { doodle: "champagne.svg", tilt: "tilt-a", day: "Friday", dateShort: "April 30, 2027", title: "Welcome", time: "", location: "", detail: "Details to come." },
       CEREMONY,
-      { doodle: "flowers.svg", tilt: "tilt-c", day: "Sunday", dateShort: "May 2, 2027", title: "Farewell", time: "", location: "", detail: "Details to come." },
+      { doodle: "flowers.svg", tilt: "tilt-c", day: "Sunday", dateShort: "May 2, 2027", title: "Farewell Breakfast", time: "", location: "", detail: "Casual final meetup for those who stick around Sunday &mdash; details TBD!" },
     ];
   }
   return [
