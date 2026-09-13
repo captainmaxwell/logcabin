@@ -387,7 +387,7 @@ async function findGuest(input) {
 const state = {
   view: "login",         // login | site | admin-login | admin
   guest: null,
-  activeTab: "events",
+  activeTab: "home",
   rsvp: { status: null, mealSelf: "", dietarySelf: "", songRequest: "", note: "", plusOnes: [] },
   rsvpSubmitted: false,
   rsvpEditing: false,
@@ -405,11 +405,11 @@ const state = {
 // replaying it just because the whole form re-renders from scratch.
 let justPicked = null; // { name, value } | null
 
-// Order matters: Events leads, and is also the tab the site opens on
-// (`state.activeTab`). RSVP sits second so it's the first thing after the
-// details once it's live — it's hidden in save-the-date mode, so the visible
-// order there is exactly Events / Lodging / Jenny + Max.
-// Photos on the "Jenny + Max" tab. Filenames name the photo rather than the
+// Order matters: Home leads and is also the tab the site opens on
+// (`state.activeTab`). RSVP sits after Events so it's the first thing after
+// the details once it's live — it's hidden in save-the-date mode, so the
+// visible order there is exactly Home / Events / Where to Stay / Gallery.
+// Photos on the "Gallery" tab. Filenames name the photo rather than the
 // slot, so replacing one changes the URL and busts the browser cache — see the
 // debugging note in CLAUDE.md.
 const GALLERY = [
@@ -420,10 +420,11 @@ const GALLERY = [
 ];
 
 const ALL_TABS = [
+  { id: "home", label: "Home" },
   { id: "events", label: "Events" },
   { id: "rsvp", label: "RSVP" },
-  { id: "lodging", label: "Lodging" },
-  { id: "gallery", label: "Jenny + Max" },
+  { id: "lodging", label: "Where to Stay" },
+  { id: "gallery", label: "Gallery" },
   { id: "registry", label: "Registry" },
   { id: "faq", label: "FAQ" },
 ];
@@ -578,7 +579,7 @@ function render() {
         }
         state.loginError = "";
         state.guest = null;
-        state.activeTab = "events";
+        state.activeTab = "home";
         state.view = "site";
         render();
         return;
@@ -721,7 +722,12 @@ function render() {
   const showRehearsal = !!g && g.isWeddingParty && state.rsvp.status === "yes";
   let tabHtml = "";
 
-  if (state.activeTab === "gallery") {
+  if (state.activeTab === "home") {
+    tabHtml = `<div style="text-align:center;">
+        <img class="doodle doodle-cabin doodle-center" src="doodles/cabin-bridge.svg" alt="The Log Cabin in the Presidio, with the Golden Gate Bridge" />
+        <p style="max-width:48ch; margin:0 auto; font-size:16px; line-height:1.6;">Please join us for our wedding celebration at the log cabin on May 1st, 2027!</p>
+      </div>`;
+  } else if (state.activeTab === "gallery") {
     // loading="lazy" so the lower photos don't compete with the first paint —
     // this tab is about half a megabyte of images.
     tabHtml = `<div class="gallery">
@@ -850,10 +856,10 @@ function render() {
     }
   } else if (state.activeTab === "lodging") {
     tabHtml = SAVE_THE_DATE_MODE
-      ? `<h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Lodging</h2>
+      ? `<h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Where to Stay</h2>
       <p style="max-width:55ch; line-height:1.6;">We're still sorting out lodging options — we'll let you know as soon as we have more details to share.</p>
       <img class="doodle doodle-train" src="doodles/f-train.svg" alt="An F-line streetcar" />`
-      : `<h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Lodging</h2>
+      : `<h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Where to Stay</h2>
       <p style="max-width:55ch; line-height:1.6; margin-bottom:16px;">Fly into SFO or OAK. Both venues are a short rideshare from downtown; parking is limited at the Presidio, so carpooling or rideshare is easiest.</p>
       <div class="cards-grid">
         ${eventCardHtml({ title: "The Argonaut Hotel", date: "Room block rate &amp; booking deadline: TBD", time: "", location: "Fisherman's Wharf, San Francisco", detail: `We've picked out the Argonaut for our room block — a nautical-themed hotel right on Fisherman's Wharf. Rate and booking link coming soon.<br><a href="https://maps.app.goo.gl/aZDg99RFGRjBZwgB7" target="_blank" rel="noopener" style="color:var(--sangria); font-weight:700;">View on Google Maps &rarr;</a>` }, false)}
@@ -880,9 +886,8 @@ function render() {
   app.innerHTML = `
     <header style="max-width:900px; margin:0 auto; padding:26px 32px 0; position:relative; text-align:center;">
       ${SAVE_THE_DATE_MODE ? "" : `<button id="logout-btn" class="btn secondary" style="position:absolute; top:26px; right:32px; padding:6px 16px; font-size:13px;">Log out</button>`}
-      <img class="doodle doodle-cabin doodle-center" src="doodles/cabin-bridge.svg" alt="The Log Cabin in the Presidio, with the Golden Gate Bridge" />
       <div class="display" style="font-size:clamp(30px, 8vw, 42px); color:var(--sangria);">Jenny &amp; Max</div>
-      <div style="font-size:12px; opacity:0.65; margin:8px 0 14px;">${g ? `Hi ${escapeHtml(g.name.split(" ")[0])} &middot; ` : ""}May 1, 2027, San Francisco &middot; ${daysUntilWedding()} days to go</div>
+      ${g ? `<div style="font-size:12px; opacity:0.65; margin:8px 0 14px;">Hi ${escapeHtml(g.name.split(" ")[0])}</div>` : `<div style="margin-bottom:14px;"></div>`}
     </header>
     <main style="max-width:900px; margin:0 auto; padding:0 32px 70px;">
       <div class="tab-nav-wrap">
@@ -905,7 +910,7 @@ function render() {
     logoutBtn.addEventListener("click", () => {
       state.view = "login";
       state.guest = null;
-      state.activeTab = "events";
+      state.activeTab = "home";
       state.rsvp = { status: null, mealSelf: "", dietarySelf: "", songRequest: "", note: "", plusOnes: [] };
       state.rsvpSubmitted = false;
       state.rsvpEditing = false;
