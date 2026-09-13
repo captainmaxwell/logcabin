@@ -119,7 +119,7 @@
      instead of being cropped to a uniform tile. `columns` is intrinsically
      responsive — 2 columns on a phone, 3 once the 620px cap is reached — so
      this needs no media queries, matching the rest of the stylesheet. */
-  .gallery { columns: 150px; column-gap: 14px; max-width: 620px; margin: 0 auto; }
+  .gallery { columns: 150px; column-gap: 18px; max-width: 620px; margin: 0 auto; }
   /* Sub-section label above a group of gallery photos (e.g. "Engagement
      Day"), reusing the .ev-title heading system a step smaller since it's
      labelling a subset of one tab, not a whole page. */
@@ -131,7 +131,7 @@
   }
   .gallery-heading:not(:first-child) { margin-top: 28px; }
   .gallery img {
-    width: 100%; display: block; margin-bottom: 14px;
+    width: 100%; display: block; margin-bottom: 18px;
     break-inside: avoid; cursor: pointer;
   }
   /* Full-size lightbox for a clicked gallery photo. z-index above the sticky
