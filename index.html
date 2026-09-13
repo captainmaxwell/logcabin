@@ -152,14 +152,13 @@
      hand-placed but don't jump around on re-render. */
   .doodle { display: block; height: auto; opacity: 0.95; }
   .doodle-center { margin-left: auto; margin-right: auto; }
-  .ev-doodle { width: 40px; margin: 0 auto 6px; }
+  .ev-doodle { height: 36px; width: auto; margin: 0 auto 6px; }
   .ev-doodle.tilt-a { transform: rotate(-7deg); }
   .ev-doodle.tilt-b { transform: rotate(5deg); }
   .ev-doodle.tilt-c { transform: rotate(-4deg); }
-  .doodle-cabin { width: min(180px, 55%); margin: 2px auto 10px; transform: rotate(-1.5deg); }
+  .doodle-cabin { width: min(240px, 64%); margin: 2px auto 6px; transform: rotate(-1.5deg); }
   .doodle-train { width: min(260px, 70%); margin: 26px auto 0; transform: rotate(2deg); }
   .doodle-puppies { width: min(150px, 46%); margin: 20px auto 0; transform: rotate(-3deg); }
-  .doodle-flowers { width: 42px; margin: 0 auto 10px; transform: rotate(6deg); }
   .party-table { border-top: 1.5px solid var(--plum); }
   .party-row {
     padding: 14px 0; border-bottom: 1.5px solid var(--plum);
@@ -338,8 +337,8 @@ const CEREMONY = { doodle: "rings.svg", tilt: "tilt-b", id: "ceremony-reception"
 const PUBLIC_EVENTS = [
   CEREMONY,
   SAVE_THE_DATE_MODE
-    ? { doodle: "cake.svg", tilt: "tilt-c", id: "brunch", day: "Sunday", dateShort: "May 2, 2027", title: "Farewell", date: "Sunday, May 2, 2027", time: "Time TBD", location: "Location TBD", detail: "One more meal together before everyone heads home — details coming soon!" }
-    : { doodle: "cake.svg", tilt: "tilt-c", id: "brunch", day: "Sunday", dateShort: "May 2, 2027", title: "Farewell", date: "Sunday, May 2, 2027", time: "10:00 AM", location: "Zazie", detail: `One more meal together before everyone heads home — hope you can join us!${ZAZIE_MAP_HTML}` },
+    ? { doodle: "flowers.svg", tilt: "tilt-c", id: "brunch", day: "Sunday", dateShort: "May 2, 2027", title: "Farewell", date: "Sunday, May 2, 2027", time: "Time TBD", location: "Location TBD", detail: "One more meal together before everyone heads home — details coming soon!" }
+    : { doodle: "flowers.svg", tilt: "tilt-c", id: "brunch", day: "Sunday", dateShort: "May 2, 2027", title: "Farewell", date: "Sunday, May 2, 2027", time: "10:00 AM", location: "Zazie", detail: `One more meal together before everyone heads home — hope you can join us!${ZAZIE_MAP_HTML}` },
 ];
 const REHEARSAL_DINNER = { doodle: "champagne.svg", tilt: "tilt-a", day: "Friday", dateShort: "April 30, 2027", title: "Rehearsal Dinner", date: "Friday, April 30, 2027", time: "7:00 PM", location: "Liholiho Yacht Club", detail: "Wedding party and partners. Casual dress, no speeches — we promise." };
 
@@ -354,7 +353,7 @@ function weekendEvents(showRehearsal) {
     return [
       { doodle: "champagne.svg", tilt: "tilt-a", day: "Friday", dateShort: "April 30, 2027", title: "Welcome", time: "", location: "", detail: "Details to come." },
       CEREMONY,
-      { doodle: "cake.svg", tilt: "tilt-c", day: "Sunday", dateShort: "May 2, 2027", title: "Farewell", time: "", location: "", detail: "Details to come." },
+      { doodle: "flowers.svg", tilt: "tilt-c", day: "Sunday", dateShort: "May 2, 2027", title: "Farewell", time: "", location: "", detail: "Details to come." },
     ];
   }
   return [
@@ -554,7 +553,6 @@ function render() {
         <div class="border-row top">${squiggleSvg()}</div>
         <div style="flex:1; display:flex; align-items:center; justify-content:center; padding:24px;">
           <div style="text-align:center; max-width:400px; width:100%;">
-            <img class="doodle doodle-flowers" src="doodles/flowers.svg" alt="" aria-hidden="true" />
             <h1 class="display" style="font-size:clamp(38px, 12vw, 60px); color:var(--sangria);">Jenny &amp; Max</h1>
             <img class="photo-circle" src="photos/jenny-max-bench.jpg" alt="Jenny and Max" />
             <div class="countdown">${daysUntilWedding()} days to go</div>
