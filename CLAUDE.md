@@ -23,7 +23,8 @@ JS in one file, no build step, no framework.
 Currently in **save-the-date mode** (see below), so the RSVP, Registry and
 FAQ tabs are hidden. Behind that flag the full site is intact:
 - Guest login by name lookup
-- Tabs: Our Story, Events, RSVP, Travel, Registry, FAQ
+- Tabs, in order: Events, RSVP, Lodging, Jenny + Max (a photo gallery),
+  Registry, FAQ. Events is also the tab the site opens on.
 - RSVP form with named plus-ones, each with their own yes/no, meal and
   dietary answer — submits, then shows a confirmation view with a
   "Change my RSVP" button to re-open it for edits
@@ -83,14 +84,15 @@ switch for "we've sent save the dates but not invitations yet." While it's
   the per-guest name lookup. There's no guest object at all in this mode, so
   anything rendering guest-specific content has to tolerate `state.guest`
   being `null`. The guest list is never even fetched.
-- The **RSVP and Registry tabs are hidden** from the nav. None of that code is
-  deleted — the whole RSVP/plus-one flow and its Apps Script backend are
-  untouched and come straight back when the flag flips.
-- **Travel** shows a "details coming" line instead of the hotel block.
+- The **RSVP, Registry and FAQ tabs are hidden** from the nav, leaving
+  Events / Lodging / Jenny + Max. None of that code is deleted — the whole
+  RSVP/plus-one flow and its Apps Script backend are untouched and come
+  straight back when the flag flips.
+- **Lodging** shows a "details coming" line instead of the hotel block.
 - **Events** shows only the ceremony's real details; Friday and Sunday are
-  placeholder rows. The Friday row deliberately has no title, because the only
-  Friday event is the wedding-party rehearsal dinner and naming it would both
-  leak the venue and imply every guest is invited.
+  placeholder rows. Friday is deliberately titled "Welcome" rather than
+  "Rehearsal Dinner" — that's a wedding-party-only event, and naming it on
+  the public page would leak the venue and imply every guest is invited.
 
 The password is in client-side source, so it's a speed bump rather than real
 security — fine for a save-the-date, not for anything actually private. (The
