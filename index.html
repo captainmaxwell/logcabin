@@ -106,11 +106,15 @@
      and matches how the date line just below it is de-emphasised, without
      adding a colour outside the palette. */
   .countdown { font-size: 13px; color: var(--plum); opacity: 0.55; font-weight: 700; margin-bottom: 4px; }
-  .story-flex { display: flex; gap: 28px; flex-wrap: wrap; align-items: flex-start; max-width: 900px; }
-  .story-flex p { flex: 1 1 320px; max-width: 60ch; line-height: 1.6; margin: 0; }
-  .story-photo {
-    flex: 1 1 280px; max-width: 340px; width: 100%; border-radius: 16px;
-    object-fit: cover; max-height: 420px;
+  /* Photo gallery. CSS multi-column rather than grid, because the photos are
+     a mix of portrait and landscape: columns let each keep its own height
+     instead of being cropped to a uniform tile. `columns` is intrinsically
+     responsive — 2 columns on a phone, 3 once the 620px cap is reached — so
+     this needs no media queries, matching the rest of the stylesheet. */
+  .gallery { columns: 150px; column-gap: 14px; max-width: 620px; margin: 0 auto; }
+  .gallery img {
+    width: 100%; display: block; border-radius: 14px; margin-bottom: 14px;
+    break-inside: avoid;
   }
   .mascot-inline { width: 40px; opacity: 0.9; }
   /* Events page: everything centred in one column, per the reference — title,
@@ -393,11 +397,25 @@ const state = {
 // replaying it just because the whole form re-renders from scratch.
 let justPicked = null; // { name, value } | null
 
+// Order matters: Events leads, and is also the tab the site opens on
+// (`state.activeTab`). RSVP sits second so it's the first thing after the
+// details once it's live — it's hidden in save-the-date mode, so the visible
+// order there is exactly Events / Lodging / Jenny + Max.
+// Photos on the "Jenny + Max" tab. Filenames name the photo rather than the
+// slot, so replacing one changes the URL and busts the browser cache — see the
+// debugging note in CLAUDE.md.
+const GALLERY = [
+  { file: "the-page-couple.jpg", alt: "Jenny and Max outside The Page" },
+  { file: "couple-bar-booth.jpg", alt: "Jenny and Max in a booth" },
+  { file: "couple-alamo-square.jpg", alt: "Jenny and Max at Alamo Square" },
+  { file: "the-page-trio.jpg", alt: "Jenny and Max with a friend outside The Page" },
+];
+
 const ALL_TABS = [
-  { id: "story", label: "Our story" },
   { id: "events", label: "Events" },
   { id: "rsvp", label: "RSVP" },
-  { id: "travel", label: "Travel" },
+  { id: "lodging", label: "Lodging" },
+  { id: "gallery", label: "Jenny + Max" },
   { id: "registry", label: "Registry" },
   { id: "faq", label: "FAQ" },
 ];
@@ -697,11 +715,11 @@ function render() {
   const showRehearsal = !!g && g.isWeddingParty && state.rsvp.status === "yes";
   let tabHtml = "";
 
-  if (state.activeTab === "story") {
-    tabHtml = `<h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Our story</h2>
-      <div class="story-flex">
-        <img class="story-photo" src="photos/jenny-max-story.jpg" alt="Jenny and Max" />
-        <p>We met on a foggy Tuesday in the Mission, waiting in the same too-long line for the same one good bakery. Six years, three apartments, and one very opinionated cat later, we're getting married a few miles from where we started — replace this with your real story.</p>
+  if (state.activeTab === "gallery") {
+    // loading="lazy" so the lower photos don't compete with the first paint —
+    // this tab is about half a megabyte of images.
+    tabHtml = `<div class="gallery">
+        ${GALLERY.map(p => `<img src="photos/${p.file}" alt="${escapeHtml(p.alt)}" loading="lazy" />`).join("")}
       </div>`;
   } else if (state.activeTab === "events") {
     tabHtml = `<div class="events-page">
@@ -824,11 +842,11 @@ function render() {
         </form>
       `;
     }
-  } else if (state.activeTab === "travel") {
+  } else if (state.activeTab === "lodging") {
     tabHtml = SAVE_THE_DATE_MODE
-      ? `<h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Travel</h2>
+      ? `<h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Lodging</h2>
       <p style="max-width:55ch; line-height:1.6;">We're still sorting out lodging options — we'll let you know as soon as we have more details to share.</p>`
-      : `<h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Travel</h2>
+      : `<h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Lodging</h2>
       <p style="max-width:55ch; line-height:1.6; margin-bottom:16px;">Fly into SFO or OAK. Both venues are a short rideshare from downtown; parking is limited at the Presidio, so carpooling or rideshare is easiest.</p>
       <div class="cards-grid">
         ${eventCardHtml({ title: "The Argonaut Hotel", date: "Room block rate &amp; booking deadline: TBD", time: "", location: "Fisherman's Wharf, San Francisco", detail: `We've picked out the Argonaut for our room block — a nautical-themed hotel right on Fisherman's Wharf. Rate and booking link coming soon.<br><a href="https://maps.app.goo.gl/aZDg99RFGRjBZwgB7" target="_blank" rel="noopener" style="color:var(--sangria); font-weight:700;">View on Google Maps &rarr;</a>` }, false)}
