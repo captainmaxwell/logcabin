@@ -114,12 +114,18 @@
      and matches how the date line just below it is de-emphasised, without
      adding a colour outside the palette. */
   .countdown { font-size: 13px; color: var(--plum); opacity: 0.55; font-weight: 700; margin-bottom: 4px; }
-  /* Photo gallery. CSS multi-column rather than grid, because the photos are
-     a mix of portrait and landscape: columns let each keep its own height
-     instead of being cropped to a uniform tile. `columns` is intrinsically
-     responsive — 2 columns on a phone, 3 once the 620px cap is reached — so
-     this needs no media queries, matching the rest of the stylesheet. */
-  .gallery { columns: 150px; column-gap: 18px; max-width: 620px; margin: 0 auto; }
+  /* Photo gallery. Grid rather than CSS multi-column: multi-column fills
+     down the first column before starting the second, so scrolling reads
+     the photo order as "whole left column, then whole right column" —
+     wrong for a gallery that's telling a story in order. Grid's default
+     auto-placement fills row by row, top to bottom, left to right, so the
+     GALLERY array order matches how eyes actually scroll down the page
+     regardless of how many columns fit (2 on a phone, 3 once the 620px cap
+     is reached — auto-fit/minmax needs no media queries, same as before).
+     Trade-off: unlike multi-column, a row's height is set by its tallest
+     photo, so a short photo can leave a gap before the next row — accepted
+     for correct reading order over tight packing. */
+  .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 18px; max-width: 620px; margin: 0 auto; }
   /* Sub-section label above a group of gallery photos (e.g. "Engagement
      Day"), reusing the .ev-title heading system a step smaller since it's
      labelling a subset of one tab, not a whole page. */
@@ -131,8 +137,7 @@
   }
   .gallery-heading:not(:first-child) { margin-top: 28px; }
   .gallery img {
-    width: 100%; display: block; margin-bottom: 18px;
-    break-inside: avoid; cursor: pointer;
+    width: 100%; display: block; cursor: pointer;
   }
   /* Full-size lightbox for a clicked gallery photo. z-index above the sticky
      header's 10 so it covers the whole page, not just <main>. */
