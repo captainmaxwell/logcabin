@@ -48,7 +48,7 @@ with and then abandoned.
 - **Type — two faces, with a strict split:**
   - **Cedarville Cursive** for headings ONLY — "Jenny & Max", section titles,
     event names (`.display` and `.ev-title`).
-  - **Playpen Sans** for everything else — body, nav, forms, dates, venues.
+  - **Josefin Sans** for everything else — body, nav, forms, dates, venues.
 
   The split is not cosmetic. Cedarville's capitals are script forms: its `D`
   reads as a lowercase `b` and its `L` as a flourished `ℒ`, so it is genuinely
@@ -57,23 +57,25 @@ with and then abandoned.
   weight (400), so any bold on a heading is synthesised by the browser.
 
   (History: a single family was the rule through Sept 2026 — Kalam, then
-  Playpen Sans — until the couple asked for a script for headings. What's
-  worth preserving is the discipline of a small, deliberate type system, not
-  the specific count.)
+  Playpen Sans — until the couple asked for a script for headings. Playpen
+  Sans was then swapped for Josefin Sans as the body face. What's worth
+  preserving is the discipline of a small, deliberate type system, not the
+  specific count.)
 - **Texture:** the cream background carries a subtle inline-SVG noise grain
   (`--grain` in `:root`), and the squiggle borders are generated from a
   *seeded* pseudo-random path so they look hand-drawn but don't twitch on
   every re-render. Don't swap either for `Math.random()`.
 - **Motifs:** hand-drawn squiggle lines (SVG) as top/bottom borders instead
-  of straight hairlines, and a set of line-art doodles in `doodles/` —
-  cabin-and-bridge, champagne, rings, cake, flowers, puppies, an F-line
-  streetcar, and the knot used as the Events divider.
+  of straight hairlines (also used under the tab bar, replacing an earlier
+  solid underline), and a set of line-art doodles in `doodles/` —
+  cabin-and-bridge, champagne, rings, cake, flowers, puppies, and an F-line
+  streetcar. (The knot divider that used to separate Events sections was
+  removed — events now just stack with plain spacing.)
 
   The doodles ship already coloured `#B9343E`, the same sangria as the
   palette, so they load as plain `<img>` and need no recolouring — but that
   also means **a palette change requires re-exporting them**, not editing a
-  variable. The knot is the one exception: it's inlined in `index.html` so
-  its fill can follow `var(--sangria)`.
+  variable.
 
   Each is tilted a few degrees via a fixed per-doodle CSS class so they look
   hand-placed. Keep those rotations fixed, not random — same reasoning as the
