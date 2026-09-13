@@ -102,7 +102,10 @@
     width: 150px; height: 150px; border-radius: 50%; object-fit: cover;
     display: block; margin: 4px auto 14px;
   }
-  .countdown { font-size: 13px; color: var(--forest); font-weight: 700; margin-bottom: 4px; }
+  /* Muted plum rather than a new grey hex — on cream it reads as a warm grey
+     and matches how the date line just below it is de-emphasised, without
+     adding a colour outside the palette. */
+  .countdown { font-size: 13px; color: var(--plum); opacity: 0.55; font-weight: 700; margin-bottom: 4px; }
   .story-flex { display: flex; gap: 28px; flex-wrap: wrap; align-items: flex-start; max-width: 900px; }
   .story-flex p { flex: 1 1 320px; max-width: 60ch; line-height: 1.6; margin: 0; }
   .story-photo {
