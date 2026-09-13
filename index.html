@@ -119,7 +119,25 @@
   .gallery { columns: 150px; column-gap: 14px; max-width: 620px; margin: 0 auto; }
   .gallery img {
     width: 100%; display: block; margin-bottom: 14px;
-    break-inside: avoid;
+    break-inside: avoid; cursor: pointer;
+  }
+  /* Full-size lightbox for a clicked gallery photo. z-index above the sticky
+     header's 10 so it covers the whole page, not just <main>. */
+  .lightbox {
+    position: fixed; inset: 0; z-index: 50;
+    background: rgba(61,38,33,0.92);
+    display: flex; align-items: center; justify-content: center;
+    padding: 40px 24px;
+  }
+  .lightbox img {
+    max-width: 90vw; max-height: 85vh; object-fit: contain;
+    border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  }
+  .lightbox-close {
+    position: fixed; top: 18px; right: 24px;
+    background: none; border: 1.5px solid var(--cream); color: var(--cream);
+    width: 40px; height: 40px; border-radius: 50%;
+    font-size: 22px; line-height: 1; cursor: pointer;
   }
   /* Events page: everything centred in one column, per the reference — title,
      then date / time / venue as spaced small caps, then the description. */
@@ -394,6 +412,7 @@ const state = {
   adminRows: null,      // null = not loaded yet
   adminLoading: false,
   adminPasscode: "",    // kept only so "Refresh" can re-authenticate
+  lightboxIndex: null,  // null = closed, else index into GALLERY of the open photo
 };
 
 // Not part of `state` (never submitted, not RSVP data) — tracks which radio
@@ -739,7 +758,7 @@ function render() {
     // loading="lazy" so the lower photos don't compete with the first paint —
     // this tab is about half a megabyte of images.
     tabHtml = `<div class="gallery">
-        ${GALLERY.map(p => `<img src="photos/${p.file}" alt="${escapeHtml(p.alt)}" loading="lazy" />`).join("")}
+        ${GALLERY.map((p, i) => `<img src="photos/${p.file}" alt="${escapeHtml(p.alt)}" loading="lazy" data-index="${i}" />`).join("")}
       </div>`;
   } else if (state.activeTab === "events") {
     tabHtml = `<div class="events-page">
@@ -897,12 +916,32 @@ function render() {
       </div>
       <div style="padding-top:32px;">${tabHtml}</div>
     </main>
+    ${state.lightboxIndex !== null ? `
+      <div class="lightbox" id="lightbox">
+        <button class="lightbox-close" id="lightbox-close" aria-label="Close">&times;</button>
+        <img src="photos/${GALLERY[state.lightboxIndex].file}" alt="${escapeHtml(GALLERY[state.lightboxIndex].alt)}" />
+      </div>` : ""}
   `;
   justPicked = null; // consumed by the render just above — don't animate again next time
 
   document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", () => { state.activeTab = btn.dataset.tab; render(); });
   });
+
+  document.querySelectorAll(".gallery img").forEach(img => {
+    img.addEventListener("click", () => { state.lightboxIndex = Number(img.dataset.index); render(); });
+  });
+
+  const lightbox = document.getElementById("lightbox");
+  if (lightbox) {
+    lightbox.addEventListener("click", (e) => {
+      if (e.target === e.currentTarget) { state.lightboxIndex = null; render(); }
+    });
+    document.getElementById("lightbox-close").addEventListener("click", () => {
+      state.lightboxIndex = null;
+      render();
+    });
+  }
 
   const logoutBtn = document.getElementById("logout-btn");
   if (logoutBtn) {
@@ -1018,6 +1057,15 @@ function leaveAdmin() {
 }
 // Covers pasting the URL into an already-open tab, where there's no reload.
 window.addEventListener("hashchange", () => { applyAdminHash(); render(); });
+
+// Registered once (not inside render()) so it doesn't stack a new listener
+// on every re-render — same reasoning as the hashchange listener above.
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && state.lightboxIndex !== null) {
+    state.lightboxIndex = null;
+    render();
+  }
+});
 
 applyAdminHash();
 render();
