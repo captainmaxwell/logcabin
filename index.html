@@ -418,10 +418,9 @@ let justPicked = null; // { name, value } | null
 // slot, so replacing one changes the URL and busts the browser cache — see the
 // debugging note in CLAUDE.md.
 const GALLERY = [
-  { file: "the-page-couple.jpg", alt: "Jenny and Max outside The Page" },
   { file: "couple-bar-booth.jpg", alt: "Jenny and Max in a booth" },
   { file: "couple-alamo-square.jpg", alt: "Jenny and Max at Alamo Square" },
-  { file: "the-page-trio.jpg", alt: "Jenny and Max with a friend outside The Page" },
+  { file: "the-page-trio.jpg", alt: "Jenny, Max, and Jenny's brother outside The Page" },
   { file: "max-jenny-kayak.jpg", alt: "Jenny and Max kayaking in Milford Sound, New Zealand" },
   { file: "max-jenny-lobster.jpg", alt: "Jenny and Max in a moose-and-lobster cutout in Maine" },
   { file: "max-jenny-florida-lobster.jpg", alt: "Jenny and Max in front of a giant lobster statue in Florida" },
@@ -736,7 +735,7 @@ function render() {
     tabHtml = `<div style="text-align:center;">
         <img class="doodle doodle-cabin doodle-center" src="doodles/cabin-bridge.svg" alt="The Log Cabin in the Presidio, with the Golden Gate Bridge" />
         <p style="max-width:48ch; margin:0 auto; font-size:16px; line-height:1.6;">Please join us for our wedding celebration at the log cabin on May 1st, 2027!</p>
-        <img class="photo-plain" src="photos/max-jenny-black-tie.jpg" alt="Jenny and Max" />
+        <img class="photo-plain" src="photos/max-jenny-tuxedo.jpg" alt="Jenny and Max" />
       </div>`;
   } else if (state.activeTab === "gallery") {
     // loading="lazy" so the lower photos don't compete with the first paint —
