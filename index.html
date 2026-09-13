@@ -112,8 +112,6 @@
     width: 150px; height: 150px; border-radius: 50%; object-fit: cover;
     display: block; margin: 4px auto 14px;
   }
-  /* Full, uncropped photo — no circle mask, no rounded corners. */
-  .photo-plain { width: min(320px, 78%); display: block; margin: 8px auto 16px; }
   /* Muted plum rather than a new grey hex — on cream it reads as a warm grey
      and matches how the date line just below it is de-emphasised, without
      adding a colour outside the palette. */
@@ -418,6 +416,7 @@ let justPicked = null; // { name, value } | null
 // slot, so replacing one changes the URL and busts the browser cache — see the
 // debugging note in CLAUDE.md.
 const GALLERY = [
+  { file: "max-jenny-tuxedo.jpg", alt: "Jenny and Max dressed up for a night out" },
   { file: "couple-bar-booth.jpg", alt: "Jenny and Max in a booth" },
   { file: "couple-alamo-square.jpg", alt: "Jenny and Max at Alamo Square" },
   { file: "the-page-trio.jpg", alt: "Jenny, Max, and Jenny's brother outside The Page" },
@@ -735,7 +734,6 @@ function render() {
     tabHtml = `<div style="text-align:center;">
         <img class="doodle doodle-cabin doodle-center" src="doodles/cabin-bridge.svg" alt="The Log Cabin in the Presidio, with the Golden Gate Bridge" />
         <p style="max-width:48ch; margin:0 auto; font-size:16px; line-height:1.6;">Please join us for our wedding celebration at the log cabin on May 1st, 2027!</p>
-        <img class="photo-plain" src="photos/max-jenny-tuxedo.jpg" alt="Jenny and Max" />
       </div>`;
   } else if (state.activeTab === "gallery") {
     // loading="lazy" so the lower photos don't compete with the first paint —
