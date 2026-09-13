@@ -65,8 +65,20 @@ with and then abandoned.
   *seeded* pseudo-random path so they look hand-drawn but don't twitch on
   every re-render. Don't swap either for `Math.random()`.
 - **Motifs:** hand-drawn squiggle lines (SVG) as top/bottom borders instead
-  of straight hairlines; a small hand-drawn Golden Gate Bridge illustration
-  (SVG, sangria-colored line art) as a nod to the SF setting.
+  of straight hairlines, and a set of line-art doodles in `doodles/` —
+  cabin-and-bridge, champagne, rings, cake, flowers, puppies, an F-line
+  streetcar, and the knot used as the Events divider.
+
+  The doodles ship already coloured `#B9343E`, the same sangria as the
+  palette, so they load as plain `<img>` and need no recolouring — but that
+  also means **a palette change requires re-exporting them**, not editing a
+  variable. The knot is the one exception: it's inlined in `index.html` so
+  its fill can follow `var(--sangria)`.
+
+  Each is tilted a few degrees via a fixed per-doodle CSS class so they look
+  hand-placed. Keep those rotations fixed, not random — same reasoning as the
+  seeded squiggle: `squiggleSvg()` and the doodles re-render constantly, and
+  live randomness makes them twitch.
 - **Explicitly rejected along the way:** a colored/highlighted ampersand in
   "Jenny & Max" (called out as looking like "AI slop"), emoji in the hero
   badge, random scattered dot/star doodles, a teal/rust/cream editorial
