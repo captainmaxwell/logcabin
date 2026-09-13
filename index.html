@@ -275,6 +275,12 @@ const CONFIG = {
   RSVP_API_URL: "https://script.google.com/macros/s/AKfycbwjuJKl9mengAxhJKlfT0dOCo9zMIP9zbs5HVS1KGV-DSwjYDksznO13iUdsUVoyciY/exec",
 };
 
+// sessionStorage (not localStorage) so a refresh keeps a guest logged in and
+// on the same tab, but the session clears when the tab/browser closes —
+// meal/dietary/song-request data shouldn't linger indefinitely on a shared
+// computer. Never holds the admin passcode or admin view state.
+const SESSION_KEY = "jm-wedding-session";
+
 /* ---------- guest data (fetched live from your Apps Script, which reads the Guests tab) ---------- */
 let guestsCache = null;
 
@@ -517,6 +523,30 @@ async function loadRsvp(guest) {
     return { row: null, plusOnes: [] };
   }
 }
+// Shared by the login form (name-lookup mode) and session restore, so both
+// hydrate state.guest/state.rsvp identically and never drift apart.
+async function hydrateGuestState(g) {
+  state.guest = g;
+  state.rsvpEditing = false;
+  const loaded = await loadRsvp(g);
+  const savedPlusOnesByName = {};
+  loaded.plusOnes.forEach(p => { savedPlusOnesByName[normalizeName(p.name)] = p; });
+  // g.plusOnes is the authoritative list of who's actually linked to this
+  // invitee in the Guests tab; any saved answers just overlay onto it, so
+  // a plus-one added to the sheet after a prior submission still shows up.
+  state.rsvp = {
+    status: loaded.row ? loaded.row.status : null,
+    mealSelf: loaded.row ? (loaded.row.meal || "") : "",
+    dietarySelf: loaded.row ? (loaded.row.dietary || "") : "",
+    songRequest: loaded.row ? (loaded.row.songRequest || "") : "",
+    note: loaded.row ? (loaded.row.note || "") : "",
+    plusOnes: (g.plusOnes || []).map(p => {
+      const saved = savedPlusOnesByName[normalizeName(p.name)];
+      return { name: p.name, status: saved ? saved.status : null, meal: saved ? (saved.meal || "") : "", dietary: saved ? (saved.dietary || "") : "" };
+    }),
+  };
+  state.rsvpSubmitted = !!loaded.row;
+}
 async function loadAllRsvps(passcode) {
   const url = `${CONFIG.RSVP_API_URL}?action=rsvps&passcode=${encodeURIComponent(passcode)}`;
   const res = await fetch(url);
@@ -610,6 +640,7 @@ function render() {
         state.guest = null;
         state.activeTab = "home";
         state.view = "site";
+        saveSession();
         render();
         return;
       }
@@ -630,27 +661,9 @@ function render() {
         return;
       }
       state.loginError = "";
-      state.guest = g;
-      state.rsvpEditing = false;
-      const loaded = await loadRsvp(g);
-      const savedPlusOnesByName = {};
-      loaded.plusOnes.forEach(p => { savedPlusOnesByName[normalizeName(p.name)] = p; });
-      // g.plusOnes is the authoritative list of who's actually linked to this
-      // invitee in the Guests tab; any saved answers just overlay onto it, so
-      // a plus-one added to the sheet after a prior submission still shows up.
-      state.rsvp = {
-        status: loaded.row ? loaded.row.status : null,
-        mealSelf: loaded.row ? (loaded.row.meal || "") : "",
-        dietarySelf: loaded.row ? (loaded.row.dietary || "") : "",
-        songRequest: loaded.row ? (loaded.row.songRequest || "") : "",
-        note: loaded.row ? (loaded.row.note || "") : "",
-        plusOnes: (g.plusOnes || []).map(p => {
-          const saved = savedPlusOnesByName[normalizeName(p.name)];
-          return { name: p.name, status: saved ? saved.status : null, meal: saved ? (saved.meal || "") : "", dietary: saved ? (saved.dietary || "") : "" };
-        }),
-      };
-      state.rsvpSubmitted = !!loaded.row;
+      await hydrateGuestState(g);
       state.view = "site";
+      saveSession();
       render();
     });
     return;
@@ -923,7 +936,7 @@ function render() {
   justPicked = null; // consumed by the render just above — don't animate again next time
 
   document.querySelectorAll(".tab-btn").forEach(btn => {
-    btn.addEventListener("click", () => { state.activeTab = btn.dataset.tab; render(); });
+    btn.addEventListener("click", () => { state.activeTab = btn.dataset.tab; saveSession(); render(); });
   });
 
   document.querySelectorAll(".gallery img").forEach(img => {
@@ -940,6 +953,7 @@ function render() {
       state.rsvpSubmitted = false;
       state.rsvpEditing = false;
       state.loginError = "";
+      clearSession();
       render();
     });
   }
@@ -1051,6 +1065,57 @@ async function refreshAdminRows() {
   render();
 }
 
+/* ---------- session persistence (refresh should not force a re-login) ---------- */
+function saveSession() {
+  try {
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify({
+      authed: true,
+      guestName: state.guest ? state.guest.name : null,
+      activeTab: state.activeTab,
+    }));
+  } catch (e) { /* sessionStorage unavailable (e.g. locked-down private mode) — not fatal */ }
+}
+
+function clearSession() {
+  try { sessionStorage.removeItem(SESSION_KEY); } catch (e) {}
+}
+
+function isValidTab(id) {
+  return TABS.some(t => t.id === id); // guards a stale/tampered tab id, or a SAVE_THE_DATE_MODE flip since the session was saved
+}
+
+async function restoreSession() {
+  if (state.view !== "login") return; // #admin (via applyAdminHash) already claimed the view — never clobber it
+  let saved;
+  try { saved = JSON.parse(sessionStorage.getItem(SESSION_KEY)); } catch (e) { saved = null; }
+  if (!saved || !saved.authed) return;
+
+  if (SAVE_THE_DATE_MODE) {
+    state.guest = null;
+    state.activeTab = isValidTab(saved.activeTab) ? saved.activeTab : "home";
+    state.view = "site";
+    render();
+    return;
+  }
+
+  if (!saved.guestName) { clearSession(); return; } // stored session predates a mode flip to name-lookup
+
+  let g;
+  try {
+    g = await findGuest(saved.guestName);
+  } catch (e) {
+    clearSession(); // network hiccup — fall back to the login screen rather than looping
+    return;
+  }
+  if (!g) { clearSession(); return; } // guest list changed server-side, name no longer resolves
+  if (state.view !== "login") return; // re-check: view may have changed while we awaited
+
+  await hydrateGuestState(g);
+  state.activeTab = isValidTab(saved.activeTab) ? saved.activeTab : "home";
+  state.view = "site";
+  render();
+}
+
 // The admin dashboard has no link on the login page — it's reached by URL:
 //   https://<site>/#admin
 // The passcode is still checked server-side in the Apps Script, so the hash
@@ -1078,6 +1143,7 @@ document.addEventListener("keydown", (e) => {
 
 applyAdminHash();
 render();
+restoreSession();
 </script>
 </body>
 </html>
