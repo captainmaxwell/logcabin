@@ -100,11 +100,6 @@
     box-shadow: 0 1px 6px rgba(61,38,33,0.12);
   }
   .card.rehearsal { background: #fdf0f3; }
-  .cards-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 16px; max-width: 900px; align-items: start;
-  }
-  .cards-grid .card { max-width: none; margin-bottom: 0; }
   table { border-collapse: collapse; width: 100%; font-size: 14px; }
   th, td { border: 1.5px solid var(--plum); padding: 8px 10px; text-align: left; vertical-align: top; }
   th { background: var(--sangria); color: var(--cream); }
@@ -329,18 +324,13 @@ function daysUntilWedding() {
 const VENUE_MAP_LINK = "https://maps.app.goo.gl/AMKeBu3wMF5qSejb8";
 const VENUE_MAP_ANCHOR = `<a href="${VENUE_MAP_LINK}" target="_blank" rel="noopener" style="color:var(--sangria); font-weight:700;">View on Google Maps &rarr;</a>`;
 const VENUE_MAP_HTML = `<br>${VENUE_MAP_ANCHOR}`;
-const ZAZIE_MAP_LINK = "https://maps.app.goo.gl/fG2AjyfbZRH15Bbj7";
-const ZAZIE_MAP_HTML = `<br><a href="${ZAZIE_MAP_LINK}" target="_blank" rel="noopener" style="color:var(--sangria); font-weight:700;">View on Google Maps &rarr;</a>`;
 
 const CEREMONY = { doodles: [{ file: "rings.svg", tilt: "tilt-b" }, { file: "cake.svg", tilt: "tilt-c" }], id: "ceremony-reception", day: "Saturday", dateShort: "May 1, 2027", title: "Ceremony &amp; Reception", date: "Saturday, May 1, 2027", time: "4:00 PM &ndash; 10:00 PM", location: "The Log Cabin, Presidio", detail: `The ceremony will be outside with the Golden Gate Bridge in view (fog permitting!) &mdash; then we'll move inside for drinks, dinner, and dancing!${VENUE_MAP_HTML}` };
 
-const PUBLIC_EVENTS = [
-  CEREMONY,
-  SAVE_THE_DATE_MODE
-    ? { doodle: "flowers.svg", tilt: "tilt-c", id: "brunch", day: "Sunday", dateShort: "May 2, 2027", title: "Farewell Breakfast", date: "Sunday, May 2, 2027", time: "Time TBD", location: "Location TBD", detail: "Casual final meetup for those who stick around Sunday &mdash; details TBD!" }
-    : { doodle: "flowers.svg", tilt: "tilt-c", id: "brunch", day: "Sunday", dateShort: "May 2, 2027", title: "Farewell", date: "Sunday, May 2, 2027", time: "10:00 AM", location: "Zazie", detail: `One more meal together before everyone heads home — hope you can join us!${ZAZIE_MAP_HTML}` },
-];
-const REHEARSAL_DINNER = { doodle: "champagne.svg", tilt: "tilt-a", day: "Friday", dateShort: "April 30, 2027", title: "Rehearsal Dinner", date: "Friday, April 30, 2027", time: "7:00 PM", location: "Liholiho Yacht Club", detail: "Wedding party and partners. Casual dress, no speeches — we promise." };
+const FAREWELL_BREAKFAST = { doodle: "flowers.svg", tilt: "tilt-c", id: "brunch", day: "Sunday", dateShort: "May 2, 2027", title: "Farewell Breakfast", date: "Sunday, May 2, 2027", time: "Time TBD", location: "Location TBD", detail: "Casual final meetup for those who stick around Sunday &mdash; details TBD!" };
+
+const PUBLIC_EVENTS = [CEREMONY, FAREWELL_BREAKFAST];
+const REHEARSAL_DINNER = { doodle: "champagne.svg", tilt: "tilt-a", day: "Friday", dateShort: "April 30, 2027", title: "Rehearsal Dinner", date: "Friday, April 30, 2027", time: "Time TBD", location: "Location TBD", detail: "We're still finalizing plans for the wedding party dinner &mdash; details coming soon!" };
 
 // The weekend as shown on the Events tab. In save-the-date mode only the
 // ceremony carries real details; Friday and Sunday are placeholders so the
@@ -353,7 +343,7 @@ function weekendEvents(showRehearsal) {
     return [
       { doodle: "champagne.svg", tilt: "tilt-a", day: "Friday", dateShort: "April 30, 2027", title: "Welcome", time: "", location: "", detail: "Details to come." },
       CEREMONY,
-      { doodle: "flowers.svg", tilt: "tilt-c", day: "Sunday", dateShort: "May 2, 2027", title: "Farewell Breakfast", time: "", location: "", detail: "Casual final meetup for those who stick around Sunday &mdash; details TBD!" },
+      FAREWELL_BREAKFAST,
     ];
   }
   return [
@@ -873,24 +863,15 @@ function render() {
       `;
     }
   } else if (state.activeTab === "lodging") {
-    tabHtml = SAVE_THE_DATE_MODE
-      ? `<h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Where to Stay</h2>
+    tabHtml = `<h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Where to Stay</h2>
       <p style="max-width:55ch; line-height:1.6;">We're still sorting out lodging options — we'll let you know as soon as we have more details to share.</p>
-      <img class="doodle doodle-train" src="doodles/f-train.svg" alt="An F-line streetcar" />`
-      : `<h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Where to Stay</h2>
-      <p style="max-width:55ch; line-height:1.6; margin-bottom:16px;">Fly into SFO or OAK. Both venues are a short rideshare from downtown; parking is limited at the Presidio, so carpooling or rideshare is easiest.</p>
-      <div class="cards-grid">
-        ${eventCardHtml({ title: "The Argonaut Hotel", date: "Room block rate &amp; booking deadline: TBD", time: "", location: "Fisherman's Wharf, San Francisco", detail: `We've picked out the Argonaut for our room block — a nautical-themed hotel right on Fisherman's Wharf. Rate and booking link coming soon.<br><a href="https://maps.app.goo.gl/aZDg99RFGRjBZwgB7" target="_blank" rel="noopener" style="color:var(--sangria); font-weight:700;">View on Google Maps &rarr;</a>` }, false)}
-      </div>
       <img class="doodle doodle-train" src="doodles/f-train.svg" alt="An F-line streetcar" />`;
   } else if (state.activeTab === "registry") {
     tabHtml = `<h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Registry</h2>
       <p style="max-width:55ch; line-height:1.6;">Your presence is the gift. If you'd like to give something, we've set up registries here — replace with real links when ready.</p>`;
   } else if (state.activeTab === "faq") {
     const faqs = [
-      SAVE_THE_DATE_MODE
-        ? { q: "What should I wear?", a: "Details coming soon — check back closer to the date!" }
-        : { q: "What should I wear?", a: "Cocktail attire. The ceremony is outdoors and can be breezy — bring a layer." },
+      { q: "What should I wear?", a: "Details coming soon — check back closer to the date!" },
       { q: "Are kids welcome?", a: "We love your little ones, but this will be an adults-only celebration." },
       { q: "Is there parking?", a: "Street parking near the Presidio is limited — rideshare is strongly recommended." },
     ];
