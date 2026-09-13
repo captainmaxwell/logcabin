@@ -2,30 +2,34 @@
 
 This file is written so a Claude Code session (or any new contributor) has
 full context without re-deriving decisions that have already been made.
-Suggestion: rename this to `CLAUDE.md` in the repo root — Claude Code reads
-that file automatically at the start of every session.
+It's named `CLAUDE.md` so Claude Code loads it automatically at the start of
+every session. `README.md` is the short version for anyone browsing the repo.
 
 ## What this is
 
 A wedding website for Jenny & Max's wedding — May 1, 2027, San Francisco.
-Guests log in by typing their name (matched against a guest list, not a real
-auth system), see event details, and RSVP. Wedding-party members additionally
-see rehearsal dinner details, but only after they RSVP "yes."
+See event details and RSVP. How guests get in depends on the mode: in
+save-the-date mode it's a single shared password; with the flag off it's a
+name matched against the guest list (not a real auth system either way).
+Wedding-party members additionally see rehearsal dinner details, but only
+after they RSVP "yes."
 
 ## Current status
 
-Working prototype, single self-contained HTML file (`jenny-max-wedding-v2.html`),
-no build step. It currently has:
-- Guest login (name lookup)
-- Tabs: Our Story, Events, RSVP, Travel, Registry, FAQ
-- RSVP form with a real backend (see below) — submits, then shows a
-  confirmation view instead of leaving the form visible, with a
-  "Change my RSVP" button to re-open it for edits
-- Admin dashboard (passcode-gated) showing all RSVP responses + CSV export
-- A companion Apps Script (`apps-script/Code.gs`) that is the actual backend
+Live at https://captainmaxwell.github.io/logcabin/, deployed by GitHub Pages
+on every push to `main`. Single self-contained `index.html` — HTML, CSS and
+JS in one file, no build step, no framework.
 
-**This has not yet been moved into a real repo, git history, or hosting.**
-That's the next step this brief is meant to support.
+Currently in **save-the-date mode** (see below), so the RSVP, Registry and
+FAQ tabs are hidden. Behind that flag the full site is intact:
+- Guest login by name lookup
+- Tabs: Our Story, Events, RSVP, Travel, Registry, FAQ
+- RSVP form with named plus-ones, each with their own yes/no, meal and
+  dietary answer — submits, then shows a confirmation view with a
+  "Change my RSVP" button to re-open it for edits
+- Admin dashboard (passcode-gated) showing all RSVP responses + CSV export,
+  reached at `/#admin` — there's no link to it on the login page
+- A companion Apps Script (`apps-script/Code.gs`) that is the actual backend
 
 ## Design system (already decided — don't relitigate without asking)
 
@@ -201,13 +205,16 @@ rediscovered from scratch:
 
 ## Immediate next steps
 
-1. Move the HTML file and Apps Script into a proper Git repo (suggest
-   `index.html` at the root, `apps-script/Code.gs` for reference/history,
-   since the actual live copy of the script lives in the Google Sheet's
-   script editor, not deployed from this repo).
-2. Deploy `index.html` as a static site via Vercel or Netlify for a real
-   public URL with real deploy logs.
-3. Longer-term: migrate off Google Sheets/Apps Script to a real backend
+1. **The repo is public and `apps-script/Code.gs` contains the literal admin
+   passcode.** Anyone can read it, and the Web App is deployed "Anyone", so
+   that passcode plus the script URL (also in this repo) is enough to pull
+   every RSVP — names, meal choices, dietary notes. Harmless while the RSVP
+   flow is switched off and the sheet is empty; a real leak the moment
+   guests start submitting. Fix before flipping `SAVE_THE_DATE_MODE` off:
+   either make the repo private, or move the passcode into Apps Script
+   Properties (`PropertiesService.getScriptProperties()`) so it isn't in
+   source at all.
+2. Longer-term: migrate off Google Sheets/Apps Script to a real backend
    (Supabase + serverless functions was the leading candidate discussed) —
    keep the same data shape (guest fields, RSVP fields) so the migration is
    mostly a storage-layer swap, not a redesign.
