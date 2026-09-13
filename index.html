@@ -162,6 +162,10 @@
   .doodle { display: block; height: auto; opacity: 0.95; }
   .doodle-center { margin-left: auto; margin-right: auto; }
   .ev-doodle { height: 36px; width: auto; margin: 0 auto 6px; }
+  /* Two doodles side by side (Ceremony & Reception's rings + cake) — the gap
+     echoes the breathing room around the "&" in the title just below. */
+  .ev-doodle-row { display: flex; align-items: center; justify-content: center; gap: 22px; margin-bottom: 6px; }
+  .ev-doodle-row .ev-doodle { margin: 0; }
   .ev-doodle.tilt-a { transform: rotate(-7deg); }
   .ev-doodle.tilt-b { transform: rotate(5deg); }
   .ev-doodle.tilt-c { transform: rotate(-4deg); }
@@ -328,7 +332,7 @@ const VENUE_MAP_HTML = `<br>${VENUE_MAP_ANCHOR}`;
 const ZAZIE_MAP_LINK = "https://maps.app.goo.gl/fG2AjyfbZRH15Bbj7";
 const ZAZIE_MAP_HTML = `<br><a href="${ZAZIE_MAP_LINK}" target="_blank" rel="noopener" style="color:var(--sangria); font-weight:700;">View on Google Maps &rarr;</a>`;
 
-const CEREMONY = { doodle: "rings.svg", tilt: "tilt-b", id: "ceremony-reception", day: "Saturday", dateShort: "May 1, 2027", title: "Ceremony &amp; Reception", date: "Saturday, May 1, 2027", time: "4:00 PM &ndash; 10:00 PM", location: "The Log Cabin, Presidio", detail: VENUE_MAP_ANCHOR };
+const CEREMONY = { doodles: [{ file: "rings.svg", tilt: "tilt-b" }, { file: "cake.svg", tilt: "tilt-c" }], id: "ceremony-reception", day: "Saturday", dateShort: "May 1, 2027", title: "Ceremony &amp; Reception", date: "Saturday, May 1, 2027", time: "4:00 PM &ndash; 10:00 PM", location: "The Log Cabin, Presidio", detail: VENUE_MAP_ANCHOR };
 
 const PUBLIC_EVENTS = [
   CEREMONY,
@@ -449,8 +453,14 @@ const TABS = SAVE_THE_DATE_MODE
 function eventSectionHtml(ev) {
   // No time and no venue means nothing is pinned down yet.
   const tbd = !ev.time && !ev.location;
+  // Most events carry one doodle (`doodle`/`tilt`); Ceremony & Reception
+  // pairs two (`doodles`), laid out side by side instead of stacked.
+  const doodles = ev.doodles || (ev.doodle ? [{ file: ev.doodle, tilt: ev.tilt }] : []);
+  const doodleHtml = doodles.length
+    ? `<div class="ev-doodle-row">${doodles.map(d => `<img class="doodle ev-doodle ${d.tilt || ""}" src="doodles/${d.file}" alt="" aria-hidden="true" />`).join("")}</div>`
+    : "";
   return `<section class="ev ${tbd ? "tbd" : ""}">
-    ${ev.doodle ? `<img class="doodle ev-doodle ${ev.tilt || ""}" src="doodles/${ev.doodle}" alt="" aria-hidden="true" />` : ""}
+    ${doodleHtml}
     <h3 class="ev-title">${ev.title}</h3>
     <div class="ev-meta ev-date">${ev.day}, ${ev.dateShort}</div>
     ${ev.time ? `<div class="ev-meta">${ev.time}</div>` : ""}
