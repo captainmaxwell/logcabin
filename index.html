@@ -80,7 +80,7 @@
     transition: opacity 0.15s ease;
   }
   .tab-btn:hover { opacity: 0.85; }
-  .tab-btn.active { border-bottom-color: var(--sangria); opacity: 1; }
+  .tab-btn.active { border-bottom-color: var(--plum); opacity: 1; }
   .tab-btn.active:hover { opacity: 1; }
   .tab-nav-wrap {
     position: sticky; top: 0; z-index: 10; width: 100vw; margin-left: calc(50% - 50vw);
@@ -162,7 +162,7 @@
   .ev-doodle.tilt-a { transform: rotate(-7deg); }
   .ev-doodle.tilt-b { transform: rotate(5deg); }
   .ev-doodle.tilt-c { transform: rotate(-4deg); }
-  .doodle-cabin { width: min(240px, 64%); margin: 2px auto 6px; transform: rotate(-1.5deg); }
+  .doodle-cabin { width: min(320px, 82%); margin: 4px auto 10px; transform: rotate(-1.5deg); }
   .doodle-train { width: min(260px, 70%); margin: 26px auto 0; transform: rotate(2deg); }
   .doodle-puppies { width: min(150px, 46%); margin: 20px auto 0; transform: rotate(-3deg); }
   .party-table { border-top: 1.5px solid var(--plum); }
@@ -878,14 +878,11 @@ function render() {
   }
 
   app.innerHTML = `
-    <div class="border-row top">${squiggleSvg()}</div>
-    <header style="max-width:900px; margin:0 auto; padding:26px 32px 0;">
-      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-        <div class="display" style="font-size:22px; color:var(--sangria);">Jenny &amp; Max</div>
-        ${SAVE_THE_DATE_MODE ? "" : `<button id="logout-btn" class="btn secondary" style="padding:6px 16px; font-size:13px;">Log out</button>`}
-      </div>
-      <div style="font-size:12px; opacity:0.65; margin:10px 0 14px;">${g ? `Hi ${escapeHtml(g.name.split(" ")[0])} &middot; ` : ""}May 1, 2027, San Francisco &middot; ${daysUntilWedding()} days to go</div>
+    <header style="max-width:900px; margin:0 auto; padding:26px 32px 0; position:relative; text-align:center;">
+      ${SAVE_THE_DATE_MODE ? "" : `<button id="logout-btn" class="btn secondary" style="position:absolute; top:26px; right:32px; padding:6px 16px; font-size:13px;">Log out</button>`}
       <img class="doodle doodle-cabin doodle-center" src="doodles/cabin-bridge.svg" alt="The Log Cabin in the Presidio, with the Golden Gate Bridge" />
+      <div class="display" style="font-size:clamp(30px, 8vw, 42px); color:var(--sangria);">Jenny &amp; Max</div>
+      <div style="font-size:12px; opacity:0.65; margin:8px 0 14px;">${g ? `Hi ${escapeHtml(g.name.split(" ")[0])} &middot; ` : ""}May 1, 2027, San Francisco &middot; ${daysUntilWedding()} days to go</div>
     </header>
     <main style="max-width:900px; margin:0 auto; padding:0 32px 70px;">
       <div class="tab-nav-wrap">
