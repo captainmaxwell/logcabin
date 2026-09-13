@@ -447,22 +447,29 @@ let justPicked = null; // { name, value } | null
 // slot, so replacing one changes the URL and busts the browser cache — see the
 // debugging note in CLAUDE.md.
 const GALLERY = [
-  { file: "engagement-vibe.jpg", alt: "The park, just before Max proposed", section: "Engagement Day — August 9, 2026" },
+  // Ordered by each photo's EXIF DateTimeOriginal (all taken the morning of
+  // Aug 9, 2026), not upload order — the -before/-during/-right-after/-after
+  // filenames already fall in capture order, and the timestamps place the
+  // two unlabeled shots (sneak, vibe) around them.
   { file: "engagement-sneak.jpg", alt: "A candid shot of Jenny and Max, moments before the proposal", section: "Engagement Day — August 9, 2026" },
   { file: "engagement-before.jpg", alt: "Jenny and Max on the bench, just before Max proposed", section: "Engagement Day — August 9, 2026" },
+  { file: "engagement-vibe.jpg", alt: "The park, just before Max proposed", section: "Engagement Day — August 9, 2026" },
   { file: "engagement-during.jpg", alt: "Max getting down on one knee", section: "Engagement Day — August 9, 2026" },
   { file: "engagement-right-after.jpg", alt: "Jenny's reaction the moment Max proposed", section: "Engagement Day — August 9, 2026" },
   { file: "engagement-after.jpg", alt: "Jenny and Max right after she said yes", section: "Engagement Day — August 9, 2026" },
-  { file: "couple-storefront-bench.jpg", alt: "Coffee to celebrate, right after the proposal", section: "Engagement Day — August 9, 2026" },
-  { file: "max-jenny-tuxedo.jpg", alt: "Jenny and Max dressed up for a night out" },
-  { file: "couple-bar-booth.jpg", alt: "Jenny and Max in a booth" },
-  { file: "couple-alamo-square.jpg", alt: "Jenny and Max at Alamo Square" },
-  { file: "the-page-trio.jpg", alt: "Jenny, Max, and Jenny's brother outside The Page" },
-  { file: "max-jenny-kayak.jpg", alt: "Jenny and Max kayaking in Milford Sound, New Zealand" },
-  { file: "max-jenny-lobster.jpg", alt: "Jenny and Max in a moose-and-lobster cutout in Maine" },
-  { file: "max-jenny-florida-lobster.jpg", alt: "Jenny and Max in front of a giant lobster statue in Florida" },
-  { file: "dogs-jenny-beach.jpg", alt: "Jenny with the dogs at Rosie's Dog Beach" },
-  { file: "max-jenny-paxi.jpg", alt: "Jenny and Max at the playground" },
+  // Its EXIF DateTimeOriginal reads Aug 19, ten days after the proposal —
+  // despite the matching outfit, it isn't from the engagement day, so it
+  // belongs here rather than in that section.
+  { file: "couple-storefront-bench.jpg", alt: "Jenny and Max grabbing coffee", section: "More Adventures" },
+  { file: "max-jenny-tuxedo.jpg", alt: "Jenny and Max dressed up for a night out", section: "More Adventures" },
+  { file: "couple-bar-booth.jpg", alt: "Jenny and Max in a booth", section: "More Adventures" },
+  { file: "couple-alamo-square.jpg", alt: "Jenny and Max at Alamo Square", section: "More Adventures" },
+  { file: "the-page-trio.jpg", alt: "Jenny, Max, and Jenny's brother outside The Page", section: "More Adventures" },
+  { file: "max-jenny-kayak.jpg", alt: "Jenny and Max kayaking in Milford Sound, New Zealand", section: "More Adventures" },
+  { file: "max-jenny-lobster.jpg", alt: "Jenny and Max in a moose-and-lobster cutout in Maine", section: "More Adventures" },
+  { file: "max-jenny-florida-lobster.jpg", alt: "Jenny and Max in front of a giant lobster statue in Florida", section: "More Adventures" },
+  { file: "dogs-jenny-beach.jpg", alt: "Jenny with the dogs at Rosie's Dog Beach", section: "More Adventures" },
+  { file: "max-jenny-paxi.jpg", alt: "Jenny and Max at the playground", section: "More Adventures" },
 ];
 
 const ALL_TABS = [
