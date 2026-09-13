@@ -916,11 +916,6 @@ function render() {
       </div>
       <div style="padding-top:32px;">${tabHtml}</div>
     </main>
-    ${state.lightboxIndex !== null ? `
-      <div class="lightbox" id="lightbox">
-        <button class="lightbox-close" id="lightbox-close" aria-label="Close">&times;</button>
-        <img src="photos/${GALLERY[state.lightboxIndex].file}" alt="${escapeHtml(GALLERY[state.lightboxIndex].alt)}" />
-      </div>` : ""}
   `;
   justPicked = null; // consumed by the render just above — don't animate again next time
 
@@ -929,19 +924,8 @@ function render() {
   });
 
   document.querySelectorAll(".gallery img").forEach(img => {
-    img.addEventListener("click", () => { state.lightboxIndex = Number(img.dataset.index); render(); });
+    img.addEventListener("click", () => { openLightbox(Number(img.dataset.index)); });
   });
-
-  const lightbox = document.getElementById("lightbox");
-  if (lightbox) {
-    lightbox.addEventListener("click", (e) => {
-      if (e.target === e.currentTarget) { state.lightboxIndex = null; render(); }
-    });
-    document.getElementById("lightbox-close").addEventListener("click", () => {
-      state.lightboxIndex = null;
-      render();
-    });
-  }
 
   const logoutBtn = document.getElementById("logout-btn");
   if (logoutBtn) {
@@ -1027,6 +1011,31 @@ function render() {
   }
 }
 
+// Opened/closed by direct DOM insertion rather than through render(), so
+// toggling the lightbox doesn't rebuild (and flash) the rest of the page —
+// in particular the gallery grid's own <img> tags, which render() would
+// otherwise recreate from scratch on every open/close.
+function openLightbox(index) {
+  state.lightboxIndex = index;
+  const div = document.createElement("div");
+  div.className = "lightbox";
+  div.id = "lightbox";
+  div.innerHTML = `
+    <button class="lightbox-close" id="lightbox-close" aria-label="Close">&times;</button>
+    <img src="photos/${GALLERY[index].file}" alt="${escapeHtml(GALLERY[index].alt)}" />
+  `;
+  div.addEventListener("click", (e) => {
+    if (e.target === e.currentTarget) closeLightbox();
+  });
+  document.body.appendChild(div);
+  document.getElementById("lightbox-close").addEventListener("click", closeLightbox);
+}
+function closeLightbox() {
+  state.lightboxIndex = null;
+  const div = document.getElementById("lightbox");
+  if (div) div.remove();
+}
+
 async function refreshAdminRows() {
   state.adminLoading = true;
   render();
@@ -1061,10 +1070,7 @@ window.addEventListener("hashchange", () => { applyAdminHash(); render(); });
 // Registered once (not inside render()) so it doesn't stack a new listener
 // on every re-render — same reasoning as the hashchange listener above.
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && state.lightboxIndex !== null) {
-    state.lightboxIndex = null;
-    render();
-  }
+  if (e.key === "Escape" && state.lightboxIndex !== null) closeLightbox();
 });
 
 applyAdminHash();
