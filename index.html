@@ -343,7 +343,7 @@ const VENUE_MAP_LINK = "https://maps.app.goo.gl/AMKeBu3wMF5qSejb8";
 const VENUE_MAP_ANCHOR = `<a href="${VENUE_MAP_LINK}" target="_blank" rel="noopener" style="color:var(--sangria); font-weight:700;">View on Google Maps &rarr;</a>`;
 const VENUE_MAP_HTML = `<br>${VENUE_MAP_ANCHOR}`;
 
-const CEREMONY = { doodles: [{ file: "rings.svg", tilt: "tilt-b" }, { file: "cake.svg", tilt: "tilt-c" }], id: "ceremony-reception", day: "Saturday", dateShort: "May 1, 2027", title: "Ceremony &amp; Reception", date: "Saturday, May 1, 2027", time: "4:00 PM &ndash; 10:00 PM", location: "The Log Cabin, Presidio", detail: `The ceremony will be outside with the Golden Gate Bridge in view (fog permitting!) &mdash; then we'll move inside for drinks, dinner, and dancing!${VENUE_MAP_HTML}` };
+const CEREMONY = { doodles: [{ file: "rings.svg", tilt: "tilt-b" }, { file: "cake.svg", tilt: "tilt-c" }], id: "ceremony-reception", day: "Saturday", dateShort: "May 1, 2027", title: "Ceremony &amp; Reception", date: "Saturday, May 1, 2027", time: "4:00 PM &ndash; 10:00 PM", location: "The Log Cabin, Presidio", detail: `The ceremony will be outside with the Golden Gate Bridge in view (fog permitting) &mdash; then we'll move inside for drinks, dinner, and dancing!${VENUE_MAP_HTML}` };
 
 const FAREWELL_BREAKFAST = { doodle: "flowers.svg", tilt: "tilt-c", id: "brunch", day: "Sunday", dateShort: "May 2, 2027", title: "Farewell Breakfast", date: "Sunday, May 2, 2027", time: "", location: "", detail: "Casual meetup for those who stick around Sunday &mdash; details TBD!" };
 
@@ -753,6 +753,7 @@ function render() {
     tabHtml = `<div style="text-align:center;">
         <img class="doodle doodle-cabin doodle-center" src="doodles/cabin-bridge.svg" alt="The Log Cabin in the Presidio, with the Golden Gate Bridge" />
         <p style="max-width:52ch; margin:0 auto; font-size:16px; line-height:1.6;">We hope you can join us for our wedding celebration at the Log Cabin in San Francisco's Presidio on May 1, 2027!</p>
+        <p style="max-width:52ch; margin:12px auto 0; font-size:14px; opacity:0.75; line-height:1.6;">We'll send you a formal invite with RSVP details closer to the date.</p>
       </div>`;
   } else if (state.activeTab === "gallery") {
     // loading="lazy" so the lower photos don't compete with the first paint —
