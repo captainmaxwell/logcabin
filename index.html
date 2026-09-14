@@ -19,22 +19,46 @@
     --sangria: #B9343E;
     --plum: #3D2621;
     --forest: #355E3B;
-    /* Paper grain: an inline SVG noise tile so the background reads like card
-       stock rather than flat colour. Inline, so it costs no extra request and
-       can't fail to load; stitchTiles='stitch' repeats the 180px tile seamlessly.
-       Two details here are load-bearing, both learned the hard way:
+    /* Paper grain: an inline SVG tile so the background reads like card stock
+       rather than flat colour. Inline, so it costs no extra request and can't
+       fail to load. It is a lit SURFACE, not flat noise — that distinction is
+       the whole point, and it replaced a single feTurbulence layer that read as
+       faint digital speckle. Four things here are load-bearing:
+
        1. color-interpolation-filters='sRGB'. SVG filters default to linearRGB,
           which reads these sRGB values as linear and washes the cream out
           (measured: 14.5 RGB drift, warmth R-B falling 20 -> 9).
-       2. The transfer centres the noise on the CREAM, not on mid-grey:
-          out = amp*L + (cream_channel - amp/2). Grey noise laid over cream
-          desaturates it toward dust (measured: 34 RGB drift). Centring on the
-          cream keeps the mean exactly on-palette while varying lightness.
-       Texture dial: `amp` is the slope, and each intercept is that channel's
-       cream value minus amp/2. Measured texture (luminance sd) by amp:
-       0.12 -> 2.7, 0.16 -> 3.4, 0.20 -> 4.3, 0.30 -> 6.2, 0.45 -> 8.7.
-       Past ~0.5 the highs clip to white and the mean starts sliding darker. */
-    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='0.16' intercept='0.9043'/%3E%3CfeFuncG type='linear' slope='0.16' intercept='0.8729'/%3E%3CfeFuncB type='linear' slope='0.16' intercept='0.8259'/%3E%3CfeFuncA type='discrete' tableValues='1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)'/%3E%3C/svg%3E");
+       2. The transfer centres the result on the CREAM, not on mid-grey. Grey
+          noise laid over cream desaturates it toward dust (measured: 34 RGB
+          drift). Solve it as: slope = targetSd / nativeSd, and per channel
+          intercept = cream_channel/255 - slope * nativeMean/255, where
+          nativeMean/nativeSd are measured off the filter with slope 1,
+          intercept 0. At these values the mean lands 0.9 RGB off the cream,
+          with warmth R-B at 20.0 — the cream's own value.
+       3. feDiffuseLighting is what makes it feel tactile: it turns the noise
+          into a bump-mapped surface with paired highlight/shadow from one light
+          direction. Flat luminance noise has no such pairing, so it never reads
+          as a physical sheet however you tune it. The second, very low-frequency
+          turbulence mixed in at 30% is sheet "formation" (the cloudiness of real
+          cotton stock) — the old single-scale noise had none: its texture
+          vanished entirely above ~2px.
+       4. feTile + the viewBox crop are NOT decoration. feDiffuseLighting builds
+          normals from a 3x3 neighbourhood and clamps at the filter-region edge,
+          which breaks tiling and leaves a visible grid (measured: seam
+          discontinuity 2.2-4.7x the interior gradient). So: stitch a periodic
+          180px noise, feTile it across 540px, light THAT, then let the viewBox
+          crop the centre 180px window — whose edges see real periodic
+          neighbours. Verified seamless (wrap discontinuity ~1.0x interior).
+
+       Tuning: `slope` is the dial; re-solve the intercepts with it via the
+       formula above, or the cream will drift. Current slope 0.1129 -> sd 2.4.
+       Beware that perceived strength is NOT proportional to measured sd —
+       structured texture reads far stronger than white noise at the same
+       number, so the old flat-noise setting of 3.4 would be much too much here.
+       Unlike that old tile, this one is sized in user units, so it looks the
+       same on a 3x phone; the old one was generated per DEVICE pixel and lost
+       31% of its strength (and most of its visibility) at DPR 3. */
+    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='180 180 180 180'%3E%3Cfilter id='g' filterUnits='userSpaceOnUse' x='0' y='0' width='540' height='540' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.14' numOctaves='4' stitchTiles='stitch' x='0' y='0' width='180' height='180' result='n'/%3E%3CfeTile in='n' x='0' y='0' width='540' height='540' result='nt'/%3E%3CfeDiffuseLighting in='nt' lighting-color='%23fff' surfaceScale='2' diffuseConstant='1' result='lit'%3E%3CfeDistantLight azimuth='225' elevation='58'/%3E%3C/feDiffuseLighting%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.008' numOctaves='3' stitchTiles='stitch' x='0' y='0' width='180' height='180' result='m'/%3E%3CfeTile in='m' x='0' y='0' width='540' height='540' result='mt'/%3E%3CfeColorMatrix in='mt' type='saturate' values='0' result='mg'/%3E%3CfeComposite in='lit' in2='mg' operator='arithmetic' k1='0' k2='0.700' k3='0.300' k4='0' result='mix'/%3E%3CfeComponentTransfer in='mix'%3E%3CfeFuncR type='linear' slope='0.1129' intercept='0.8978'/%3E%3CfeFuncG type='linear' slope='0.1129' intercept='0.8665'/%3E%3CfeFuncB type='linear' slope='0.1129' intercept='0.8194'/%3E%3CfeFuncA type='discrete' tableValues='1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect x='0' y='0' width='540' height='540' filter='url(%23g)'/%3E%3C/svg%3E");
   }
   * { box-sizing: border-box; }
   body {
