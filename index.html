@@ -76,6 +76,13 @@
   * { box-sizing: border-box; }
   body {
     margin: 0;
+    /* .tab-nav-wrap breaks out to 100vw for an edge-to-edge sticky bar; 100vw
+       can be a hair wider than the true visible viewport (it counts reserved
+       scrollbar space), which without this shows up as a few px of sideways
+       scroll/off-centering on mobile. Nothing on the page needs real
+       horizontal scroll at this level — .tab-nav and the admin RSVP table
+       scroll sideways via their own local overflow-x, unaffected by this. */
+    overflow-x: hidden;
     background-color: var(--cream);
     background-image: var(--grain);
     color: var(--plum);
