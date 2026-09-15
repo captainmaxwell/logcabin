@@ -231,6 +231,12 @@
   .gallery img {
     width: 100%; display: block; cursor: pointer;
   }
+  /* A few photos in a run are meant to read as a matched set (see GALLERY's
+     `crop: true`) even though their source shots aren't identically framed —
+     force them to a shared aspect ratio instead of each keeping its own. */
+  .gallery img.gallery-crop {
+    aspect-ratio: 2 / 3; object-fit: cover; height: 100%;
+  }
   /* Full-size lightbox for a clicked gallery photo. z-index above the sticky
      header's 10 so it covers the whole page, not just <main>. */
   .lightbox {
@@ -549,11 +555,10 @@ const GALLERY = [
   // filenames already fall in capture order, and the timestamps place the
   // two unlabeled shots (sneak, vibe) around them.
   { file: "engagement-sneak.jpg", alt: "A candid shot of Jenny and Max, moments before the proposal", section: "Engagement Day — August 9, 2026" },
-  { file: "engagement-before.jpg", alt: "Jenny and Max on the bench, just before Max proposed", section: "Engagement Day — August 9, 2026" },
   { file: "engagement-vibe.jpg", alt: "The park, just before Max proposed", section: "Engagement Day — August 9, 2026" },
-  { file: "engagement-during.jpg", alt: "Max getting down on one knee", section: "Engagement Day — August 9, 2026" },
-  { file: "engagement-right-after.jpg", alt: "Jenny's reaction the moment Max proposed", section: "Engagement Day — August 9, 2026" },
-  { file: "engagement-after.jpg", alt: "Jenny and Max right after she said yes", section: "Engagement Day — August 9, 2026" },
+  { file: "engagement-during.jpg", alt: "Max getting down on one knee", section: "Engagement Day — August 9, 2026", crop: true },
+  { file: "engagement-right-after.jpg", alt: "Jenny's reaction the moment Max proposed", section: "Engagement Day — August 9, 2026", crop: true },
+  { file: "engagement-after.jpg", alt: "Jenny and Max right after she said yes", section: "Engagement Day — August 9, 2026", crop: true },
   { file: "couple-storefront-bench.jpg", alt: "Coffee to celebrate, right after the proposal", section: "Engagement Day — August 9, 2026" },
   { file: "max-jenny-tuxedo.jpg", alt: "Jenny and Max dressed up for a night out", section: "More Adventures" },
   { file: "couple-bar-booth.jpg", alt: "Jenny and Max in a booth", section: "More Adventures" },
@@ -904,7 +909,7 @@ function render() {
     tabHtml = galleryGroups.map(group => `
         ${group.section ? `<h3 class="gallery-heading">${escapeHtml(group.section)}</h3>` : ""}
         <div class="gallery">
-          ${group.photos.map(p => `<img src="photos/${p.file}" alt="${escapeHtml(p.alt)}" loading="lazy" data-index="${p.i}" />`).join("")}
+          ${group.photos.map(p => `<img src="photos/${p.file}" alt="${escapeHtml(p.alt)}" loading="lazy" data-index="${p.i}"${p.crop ? ' class="gallery-crop"' : ""} />`).join("")}
         </div>`).join("");
   } else if (state.activeTab === "events") {
     tabHtml = `<div class="events-page">
