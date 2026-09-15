@@ -126,8 +126,10 @@
     background: none; border: none; flex-shrink: 0; white-space: nowrap;
     padding: 8px 2px; margin-right: 24px; cursor: pointer; color: var(--plum); opacity: 0.55; font-size: 15px;
     transition: opacity 0.15s ease, color 0.15s ease;
+    -webkit-tap-highlight-color: transparent; outline: none;
   }
   .tab-btn:hover { opacity: 0.85; }
+  .tab-btn:focus-visible { outline: 2px solid var(--forest); outline-offset: 3px; border-radius: 4px; }
   /* No underline here — the wavy squiggle already runs the width of the nav
      just below, and a second, straight line stacked right above it read as
      a heavy double-rule. The active tab is marked by color + weight instead. */
