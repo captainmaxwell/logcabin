@@ -30,11 +30,16 @@
           (measured: 14.5 RGB drift, warmth R-B falling 20 -> 9).
        2. The transfer centres the result on the CREAM, not on mid-grey. Grey
           noise laid over cream desaturates it toward dust (measured: 34 RGB
-          drift). Solve it as: slope = targetSd / nativeSd, and per channel
-          intercept = cream_channel/255 - slope * nativeMean/255, where
-          nativeMean/nativeSd are measured off the filter with slope 1,
-          intercept 0. At these values the mean lands 0.9 RGB off the cream,
-          with warmth R-B at 20.0 — the cream's own value.
+          drift). Per channel:
+             intercept = cream_channel/255 - slope * nativeMean/255
+          where nativeMean is measured off the filter with slope 1, intercept 0.
+          Measure it at SEVERAL device pixel ratios and use a weighted mean
+          (0.2/0.4/0.4 across DPR 1/2/3 — most guests are on phones). A
+          lighting-derived mean shifts with resolution, and the finer the grain
+          the more it shifts: calibrating on DPR 1 alone sent drift at DPR 3 to
+          4.45 RGB at baseFrequency 0.50, worse than the 3.3 that prompted the
+          original fix. Weighted, it holds under 1.5 everywhere, warmth R-B on
+          20.0 — the cream's own value.
        3. feDiffuseLighting is what makes it feel tactile: it turns the noise
           into a bump-mapped surface with paired highlight/shadow from one light
           direction. Flat luminance noise has no such pairing, so it never reads
@@ -50,15 +55,23 @@
           crop the centre 180px window — whose edges see real periodic
           neighbours. Verified seamless (wrap discontinuity ~1.0x interior).
 
-       Tuning: `slope` is the dial; re-solve the intercepts with it via the
-       formula above, or the cream will drift. Current slope 0.0847 -> sd 1.8.
-       Beware that perceived strength is NOT proportional to measured sd —
+       Tuning — two separate dials, don't confuse them:
+         * the fibre baseFrequency is TOOTH SIZE. Currently 0.36 (~2.8px grain).
+           Lower = bigger grain; 0.14 was tried and read as "too zoomed in".
+         * `slope` is CONTRAST. Currently 0.0406. Re-solve the intercepts
+           whenever you change it, or the cream will drift.
+       Judge and calibrate strength at DPR 3, not DPR 1 — that's what a phone
+       shows, and finer grain reads STRONGER there at the same nominal setting
+       (sd at DPR 3 rose 2.69 -> 3.68 going from baseFrequency 0.24 to 0.50).
+       Current settings measure sd 1.2 at DPR 1, 2.0 at DPR 3.
+       Also note perceived strength is NOT proportional to measured sd —
        structured texture reads far stronger than white noise at the same
        number, so the old flat-noise setting of 3.4 would be much too much here.
-       Unlike that old tile, this one is sized in user units, so it looks the
-       same on a 3x phone; the old one was generated per DEVICE pixel and lost
-       31% of its strength (and most of its visibility) at DPR 3. */
-    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='180 180 180 180'%3E%3Cfilter id='g' filterUnits='userSpaceOnUse' x='0' y='0' width='540' height='540' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.14' numOctaves='4' stitchTiles='stitch' x='0' y='0' width='180' height='180' result='n'/%3E%3CfeTile in='n' x='0' y='0' width='540' height='540' result='nt'/%3E%3CfeDiffuseLighting in='nt' lighting-color='%23fff' surfaceScale='2' diffuseConstant='1' result='lit'%3E%3CfeDistantLight azimuth='225' elevation='58'/%3E%3C/feDiffuseLighting%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.008' numOctaves='3' stitchTiles='stitch' x='0' y='0' width='180' height='180' result='m'/%3E%3CfeTile in='m' x='0' y='0' width='540' height='540' result='mt'/%3E%3CfeColorMatrix in='mt' type='saturate' values='0' result='mg'/%3E%3CfeComposite in='lit' in2='mg' operator='arithmetic' k1='0' k2='0.700' k3='0.300' k4='0' result='mix'/%3E%3CfeComponentTransfer in='mix'%3E%3CfeFuncR type='linear' slope='0.0847' intercept='0.9195'/%3E%3CfeFuncG type='linear' slope='0.0847' intercept='0.8881'/%3E%3CfeFuncB type='linear' slope='0.0847' intercept='0.8410'/%3E%3CfeFuncA type='discrete' tableValues='1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect x='0' y='0' width='540' height='540' filter='url(%23g)'/%3E%3C/svg%3E");
+       Unlike that old tile, this one is sized in user units, so the grain is
+       the same physical size on a 3x phone; the old one was generated per
+       DEVICE pixel and lost 31% of its strength (and most of its visibility)
+       at DPR 3. */
+    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='180 180 180 180'%3E%3Cfilter id='g' filterUnits='userSpaceOnUse' x='0' y='0' width='540' height='540' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.36' numOctaves='4' stitchTiles='stitch' x='0' y='0' width='180' height='180' result='n'/%3E%3CfeTile in='n' x='0' y='0' width='540' height='540' result='nt'/%3E%3CfeDiffuseLighting in='nt' lighting-color='%23fff' surfaceScale='2' diffuseConstant='1' result='lit'%3E%3CfeDistantLight azimuth='225' elevation='58'/%3E%3C/feDiffuseLighting%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.008' numOctaves='3' stitchTiles='stitch' x='0' y='0' width='180' height='180' result='m'/%3E%3CfeTile in='m' x='0' y='0' width='540' height='540' result='mt'/%3E%3CfeColorMatrix in='mt' type='saturate' values='0' result='mg'/%3E%3CfeComposite in='lit' in2='mg' operator='arithmetic' k1='0' k2='0.700' k3='0.300' k4='0' result='mix'/%3E%3CfeComponentTransfer in='mix'%3E%3CfeFuncR type='linear' slope='0.0406' intercept='0.9562'/%3E%3CfeFuncG type='linear' slope='0.0406' intercept='0.9248'/%3E%3CfeFuncB type='linear' slope='0.0406' intercept='0.8777'/%3E%3CfeFuncA type='discrete' tableValues='1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect x='0' y='0' width='540' height='540' filter='url(%23g)'/%3E%3C/svg%3E");
   }
   * { box-sizing: border-box; }
   body {
