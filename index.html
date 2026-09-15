@@ -111,6 +111,20 @@
   .squiggle-strip { display:block; }
   h1, h2 { font-weight: 700; margin: 0; }
   input, select, textarea, button { font-family: 'Josefin Sans', sans-serif; font-size: 15px; }
+  /* iOS Safari auto-zooms the whole page when a focused input/select/textarea
+     computes to under 16px, to keep the field legible -- and because this is
+     a single-page app that never navigates, that zoom (and the pan it leaves
+     behind) carries straight into whatever gets rendered next instead of
+     resetting on a fresh load. That's what the "horizontal drift" reports
+     were: it only ever showed up right after typing into a field (the login
+     password, most visibly), it's WebKit-only zoom behavior with nothing to
+     do with layout/overflow (which is why nothing here ever reproduced it —
+     Chromium doesn't have this quirk at all), and it explains why some
+     reloads looked "fixed": a reload that reused an existing logged-in
+     session never re-focused an input, so it never triggered. Buttons don't
+     get focus-zoomed (nothing to type into), so only the three real form
+     controls need to clear the threshold. */
+  input, select, textarea { font-size: 16px; }
   .field {
     width: 100%; padding: 10px 14px; border: none;
     border-radius: 14px; background: white; color: var(--plum);
