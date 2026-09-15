@@ -74,14 +74,18 @@
     --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='180 180 180 180'%3E%3Cfilter id='g' filterUnits='userSpaceOnUse' x='0' y='0' width='540' height='540' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.36' numOctaves='4' stitchTiles='stitch' x='0' y='0' width='180' height='180' result='n'/%3E%3CfeTile in='n' x='0' y='0' width='540' height='540' result='nt'/%3E%3CfeDiffuseLighting in='nt' lighting-color='%23fff' surfaceScale='2' diffuseConstant='1' result='lit'%3E%3CfeDistantLight azimuth='225' elevation='58'/%3E%3C/feDiffuseLighting%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.008' numOctaves='3' stitchTiles='stitch' x='0' y='0' width='180' height='180' result='m'/%3E%3CfeTile in='m' x='0' y='0' width='540' height='540' result='mt'/%3E%3CfeColorMatrix in='mt' type='saturate' values='0' result='mg'/%3E%3CfeComposite in='lit' in2='mg' operator='arithmetic' k1='0' k2='0.700' k3='0.300' k4='0' result='mix'/%3E%3CfeComponentTransfer in='mix'%3E%3CfeFuncR type='linear' slope='0.0406' intercept='0.9562'/%3E%3CfeFuncG type='linear' slope='0.0406' intercept='0.9248'/%3E%3CfeFuncB type='linear' slope='0.0406' intercept='0.8777'/%3E%3CfeFuncA type='discrete' tableValues='1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect x='0' y='0' width='540' height='540' filter='url(%23g)'/%3E%3C/svg%3E");
   }
   * { box-sizing: border-box; }
+  /* .tab-nav-wrap breaks out to 100vw for an edge-to-edge sticky bar; 100vw
+     can be a hair wider than the true visible viewport, which without this
+     shows up as a few px of sideways scroll/off-centering on mobile. Needed
+     on html, not just body — on iOS Safari (and Safari-based browsers) the
+     page's own drag-scroll is governed by the root html element, so
+     overflow-x:hidden on body alone doesn't stop it there. Nothing on the
+     page needs real horizontal scroll at this level — .tab-nav and the
+     admin RSVP table scroll sideways via their own local overflow-x,
+     unaffected by this. */
+  html { overflow-x: hidden; }
   body {
     margin: 0;
-    /* .tab-nav-wrap breaks out to 100vw for an edge-to-edge sticky bar; 100vw
-       can be a hair wider than the true visible viewport (it counts reserved
-       scrollbar space), which without this shows up as a few px of sideways
-       scroll/off-centering on mobile. Nothing on the page needs real
-       horizontal scroll at this level — .tab-nav and the admin RSVP table
-       scroll sideways via their own local overflow-x, unaffected by this. */
     overflow-x: hidden;
     background-color: var(--cream);
     background-image: var(--grain);
