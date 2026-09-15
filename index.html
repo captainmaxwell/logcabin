@@ -243,13 +243,6 @@
   .gallery img.gallery-wide {
     grid-column: 1 / -1;
   }
-  /* A portrait photo landing between two `wide` rows above has no neighbor
-     to sit next to at any column count, so it'd otherwise be stranded in
-     the grid's first column with empty cells beside it — span the row and
-     center it at roughly its natural single-column width instead. */
-  .gallery img.gallery-solo {
-    grid-column: 1 / -1; width: auto; max-width: 220px; margin: 0 auto;
-  }
   /* Full-size lightbox for a clicked gallery photo. z-index above the sticky
      header's 10 so it covers the whole page, not just <main>. */
   .lightbox {
@@ -578,9 +571,9 @@ const GALLERY = [
   { file: "couple-bar-booth.jpg", alt: "Jenny and Max in a booth", section: "More Adventures", crop: true },
   { file: "the-page-trio.jpg", alt: "Jenny, Max, and Jenny's brother outside The Page", section: "More Adventures", crop: true },
   { file: "max-jenny-kayak.jpg", alt: "Jenny and Max kayaking in Milford Sound, New Zealand", section: "More Adventures", wide: true },
-  { file: "max-jenny-lobster.jpg", alt: "Jenny and Max in a moose-and-lobster cutout in Maine", section: "More Adventures", solo: true },
+  { file: "max-jenny-lobster.jpg", alt: "Jenny and Max in a moose-and-lobster cutout in Maine", section: "More Adventures", crop: true },
+  { file: "dogs-jenny-beach.jpg", alt: "Jenny with the dogs at Rosie's Dog Beach", section: "More Adventures", crop: true },
   { file: "max-jenny-florida-lobster.jpg", alt: "Jenny and Max in front of a giant lobster statue in Florida", section: "More Adventures", wide: true },
-  { file: "dogs-jenny-beach.jpg", alt: "Jenny with the dogs at Rosie's Dog Beach", section: "More Adventures", solo: true },
   { file: "max-jenny-paxi.jpg", alt: "Jenny and Max at the playground", section: "More Adventures", wide: true },
 ];
 
@@ -922,7 +915,7 @@ function render() {
     tabHtml = galleryGroups.map(group => `
         ${group.section ? `<h3 class="gallery-heading">${escapeHtml(group.section)}</h3>` : ""}
         <div class="gallery">
-          ${group.photos.map(p => `<img src="photos/${p.file}" alt="${escapeHtml(p.alt)}" loading="lazy" data-index="${p.i}"${p.crop ? ' class="gallery-crop"' : p.wide ? ' class="gallery-wide"' : p.solo ? ' class="gallery-solo"' : ""} />`).join("")}
+          ${group.photos.map(p => `<img src="photos/${p.file}" alt="${escapeHtml(p.alt)}" loading="lazy" data-index="${p.i}"${p.crop ? ' class="gallery-crop"' : p.wide ? ' class="gallery-wide"' : ""} />`).join("")}
         </div>`).join("");
   } else if (state.activeTab === "events") {
     tabHtml = `<div class="events-page">
