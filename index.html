@@ -74,19 +74,24 @@
     --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='180 180 180 180'%3E%3Cfilter id='g' filterUnits='userSpaceOnUse' x='0' y='0' width='540' height='540' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.36' numOctaves='4' stitchTiles='stitch' x='0' y='0' width='180' height='180' result='n'/%3E%3CfeTile in='n' x='0' y='0' width='540' height='540' result='nt'/%3E%3CfeDiffuseLighting in='nt' lighting-color='%23fff' surfaceScale='2' diffuseConstant='1' result='lit'%3E%3CfeDistantLight azimuth='225' elevation='58'/%3E%3C/feDiffuseLighting%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.008' numOctaves='3' stitchTiles='stitch' x='0' y='0' width='180' height='180' result='m'/%3E%3CfeTile in='m' x='0' y='0' width='540' height='540' result='mt'/%3E%3CfeColorMatrix in='mt' type='saturate' values='0' result='mg'/%3E%3CfeComposite in='lit' in2='mg' operator='arithmetic' k1='0' k2='0.700' k3='0.300' k4='0' result='mix'/%3E%3CfeComponentTransfer in='mix'%3E%3CfeFuncR type='linear' slope='0.0406' intercept='0.9562'/%3E%3CfeFuncG type='linear' slope='0.0406' intercept='0.9248'/%3E%3CfeFuncB type='linear' slope='0.0406' intercept='0.8777'/%3E%3CfeFuncA type='discrete' tableValues='1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect x='0' y='0' width='540' height='540' filter='url(%23g)'/%3E%3C/svg%3E");
   }
   * { box-sizing: border-box; }
-  /* .tab-nav-wrap breaks out to 100vw for an edge-to-edge sticky bar; 100vw
-     can be a hair wider than the true visible viewport, which without this
-     shows up as a few px of sideways scroll/off-centering on mobile. Needed
-     on html, not just body — on iOS Safari (and Safari-based browsers) the
-     page's own drag-scroll is governed by the root html element, so
-     overflow-x:hidden on body alone doesn't stop it there. Nothing on the
-     page needs real horizontal scroll at this level — .tab-nav and the
-     admin RSVP table scroll sideways via their own local overflow-x,
-     unaffected by this. */
-  html { overflow-x: hidden; }
+  /* Belt-and-braces against sideways drift on mobile — .tab-nav-wrap used to
+     break out to 100vw for its edge-to-edge sticky bar, which is a documented
+     source of a few px of horizontal drag/bounce on iOS WebKit (Safari AND
+     Chrome-for-iOS, since both run WebKit there) that overflow-x:hidden alone
+     doesn't reliably stop, even though it fully clips the same layout here in
+     Chromium. Fixed at the source below by dropping the 100vw breakout
+     entirely (.tab-nav-wrap is now a sibling of <main>, not nested inside its
+     max-width:900px container, so it doesn't need viewport units to go edge-
+     to-edge). `clip` is kept as a backstop rather than `hidden`: `hidden`
+     still establishes a scroll container that elastic/bounce gesture handling
+     can interact with, `clip` removes the ability to scroll at all. Safari
+     16+ (2022) supports it. Nothing on the page needs real horizontal scroll
+     at this level — .tab-nav and the admin RSVP table scroll sideways via
+     their own local overflow-x, unaffected by this. */
+  html { overflow-x: clip; }
   body {
     margin: 0;
-    overflow-x: hidden;
+    overflow-x: clip;
     background-color: var(--cream);
     background-image: var(--grain);
     color: var(--plum);
@@ -136,9 +141,12 @@
   .tab-btn.active { color: var(--sangria); opacity: 1; font-weight: 700; }
   .tab-btn.active:hover { opacity: 1; }
   .tab-nav-wrap {
-    position: sticky; top: 0; z-index: 10; width: 100vw; margin-left: calc(50% - 50vw);
-    /* Carries the same grain as the page so the bar doesn't read as a flat
-       patch sitting on a textured background while content scrolls under it. */
+    position: sticky; top: 0; z-index: 10;
+    /* No width/margin-left breakout — this sits outside <main>'s
+       max-width:900px container (see render()), so it's already the full
+       width of its real, unconstrained parent (#app/body). A 100vw breakout
+       used to be needed here and was a source of mobile drift — see the note
+       above html/body's overflow-x. */
     background-color: var(--cream); background-image: var(--grain);
   }
   .tab-nav {
@@ -1014,13 +1022,13 @@ function render() {
       <div class="display" style="font-size:clamp(30px, 8vw, 42px); color:var(--sangria);">Jenny &amp; Max</div>
       ${g ? `<div style="font-size:12px; opacity:0.65; margin:8px 0 14px;">Hi ${escapeHtml(g.name.split(" ")[0])}</div>` : `<div style="margin-bottom:14px;"></div>`}
     </header>
-    <main style="max-width:900px; margin:0 auto; padding:0 32px 70px;">
-      <div class="tab-nav-wrap">
-        <div class="tab-nav">
-          ${TABS.map(t => `<button class="tab-btn ${state.activeTab === t.id ? "active" : ""}" data-tab="${t.id}">${t.label}</button>`).join("")}
-        </div>
-        <div class="border-row bottom" style="margin: 0;">${squiggleSvg()}</div>
+    <div class="tab-nav-wrap">
+      <div class="tab-nav">
+        ${TABS.map(t => `<button class="tab-btn ${state.activeTab === t.id ? "active" : ""}" data-tab="${t.id}">${t.label}</button>`).join("")}
       </div>
+      <div class="border-row bottom" style="margin: 0;">${squiggleSvg()}</div>
+    </div>
+    <main style="max-width:900px; margin:0 auto; padding:0 32px 70px;">
       <div style="padding-top:32px;">${tabHtml}</div>
     </main>
   `;
