@@ -96,6 +96,10 @@
     color: var(--plum);
     font-family: 'Josefin Sans', sans-serif;
     font-weight: 400;
+    /* Backstop alongside .tab-nav's overscroll-behavior-x below: nothing at
+       this level should ever bounce/chain sideways, only .tab-nav's own
+       local horizontal scroll needs it. */
+    overscroll-behavior-x: none;
   }
   #app { overflow-x: clip; }
   /* Two faces, with a strict split: Cedarville Cursive is a delicate script
@@ -168,6 +172,21 @@
     justify-content: center;
     max-width: 900px; margin: 0 auto; padding: 8px 32px;
     scrollbar-width: none; /* Firefox */
+    /* This is the only horizontally-scrollable element on the page, and the
+       only thing that's different between the login screen (never drifts)
+       and everything after login (does): without this, a touch that starts
+       on the tab bar and hits its scroll edge -- or just has any horizontal
+       component, which a real "scroll down" swipe almost always does when it
+       starts near this sticky bar at the top of the screen -- can have its
+       bounce/rubber-band effect chained up to the whole page by iOS, which
+       reads exactly like the page itself dragging sideways. `contain` stops
+       that chaining at this element's own boundary: it can still bounce
+       locally, it just can't hand the gesture up to the parent. Two overflow-
+       x:clip rounds before this (on html/body, then on #app) didn't touch
+       this because `overflow` governs layout/scroll position, not gesture
+       chaining -- that's `overscroll-behavior`'s job, a different mechanism
+       entirely. Safari 16+ (2022) supports it. */
+    overscroll-behavior-x: contain;
   }
   .tab-nav::-webkit-scrollbar { display: none; }
   .card {
