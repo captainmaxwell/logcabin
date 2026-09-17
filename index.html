@@ -151,6 +151,10 @@
     transition: opacity 0.15s ease, color 0.15s ease;
     -webkit-tap-highlight-color: transparent; outline: none;
   }
+  /* Without this, the last button's own margin-right has no counterpart on
+     the left, so .tab-nav's justify-content:center centers a box that's
+     24px wider than the visible tabs — the row reads as shifted left. */
+  .tab-btn:last-child { margin-right: 0; }
   .tab-btn:hover { opacity: 0.85; }
   .tab-btn:focus-visible { outline: 2px solid var(--forest); outline-offset: 3px; border-radius: 4px; }
   /* No underline here — the wavy squiggle already runs the width of the nav
