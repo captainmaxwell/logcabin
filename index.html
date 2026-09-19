@@ -484,7 +484,13 @@ function daysUntilWedding() {
   return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
 }
 
-const VENUE_MAP_LINK = "https://maps.app.goo.gl/AMKeBu3wMF5qSejb8";
+// A plain Maps search URL instead of a maps.app.goo.gl share short link --
+// short links route through Google's redirect service before handing off
+// to the Maps app, and that handoff can fail with "Unsupported link" even
+// though the same short link opens fine in a browser. A search query URL
+// skips that redirect entirely and is also easier to update if the venue's
+// exact address changes.
+const VENUE_MAP_LINK = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent("The Log Cabin, Presidio, San Francisco, CA");
 const VENUE_MAP_ANCHOR = `<a href="${VENUE_MAP_LINK}" target="_blank" rel="noopener" style="color:var(--sangria); font-weight:700;">View on Google Maps &rarr;</a>`;
 const VENUE_MAP_HTML = `<br>${VENUE_MAP_ANCHOR}`;
 
