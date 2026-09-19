@@ -1,0 +1,28 @@
+name: Purge Cloudflare cache
+
+# `page_build` fires when GitHub finishes building/deploying the Pages site
+# for a "Deploy from a branch" setup (what this repo uses) — this runs
+# after the new content is actually live at the GH Pages origin, not just
+# after the push, so Cloudflare doesn't re-cache the old version.
+"on":
+  page_build:
+
+jobs:
+  purge:
+    runs-on: ubuntu-latest
+    if: github.event.build.status == 'built'
+    steps:
+      - name: Purge everything
+        run: |
+          response=$(curl -s -w "\n%{http_code}" -X POST \
+            "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID }}/purge_cache" \
+            -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            --data '{"purge_everything":true}')
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | sed '$d')
+          echo "$body"
+          if [ "$http_code" -ge 300 ] || ! echo "$body" | grep -q '"success":true'; then
+            echo "Cloudflare purge failed (HTTP $http_code)"
+            exit 1
+          fi
