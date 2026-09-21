@@ -324,6 +324,7 @@
   .doodle-cabin { width: min(380px, 88%); margin: 4px auto 22px; transform: rotate(-1.5deg); }
   .doodle-train { width: min(260px, 70%); margin: 26px auto 0; transform: rotate(2deg); }
   .doodle-puppies { width: min(150px, 46%); margin: 20px auto 0; transform: rotate(-3deg); }
+  .doodle-flowers { width: min(200px, 56%); margin: 26px auto 0; transform: rotate(-2deg); }
   .party-table { border-top: 1.5px solid var(--plum); }
   .party-row {
     padding: 14px 0; border-bottom: 1.5px solid var(--plum);
@@ -612,6 +613,7 @@ const ALL_TABS = [
   { id: "events", label: "Events" },
   { id: "rsvp", label: "RSVP" },
   { id: "lodging", label: "Where to Stay" },
+  { id: "todo", label: "Things to Do" },
   { id: "gallery", label: "Gallery" },
   { id: "registry", label: "Registry" },
   { id: "faq", label: "FAQ" },
@@ -619,8 +621,10 @@ const ALL_TABS = [
 // Registry and RSVP aren't deleted, just hidden from the nav while
 // save-the-date mode is on — their render logic and the whole RSVP/plus-one
 // backend path further down are untouched, so flipping SAVE_THE_DATE_MODE to
-// false brings them straight back.
-const HIDDEN_IN_SAVE_THE_DATE = ["registry", "rsvp", "faq"];
+// false brings them straight back. Things to Do is still being written, so
+// it's hidden the same way — add it back to ALL_TABS's nav order once it's
+// ready to remove from this list.
+const HIDDEN_IN_SAVE_THE_DATE = ["registry", "rsvp", "faq", "todo"];
 const TABS = SAVE_THE_DATE_MODE
   ? ALL_TABS.filter(t => !HIDDEN_IN_SAVE_THE_DATE.includes(t.id))
   : ALL_TABS;
@@ -1073,6 +1077,12 @@ function render() {
       <h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Where to Stay</h2>
       <p style="max-width:55ch; margin:0 auto; line-height:1.6;">We're working on a hotel room block near Fisherman's Wharf. Details and recommendations coming soon.</p>
       <img class="doodle doodle-train" src="doodles/f-train.svg" alt="An F-line streetcar" />
+    </div>`;
+  } else if (state.activeTab === "todo") {
+    tabHtml = `<div class="events-page">
+      <h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Things to Do</h2>
+      <p style="max-width:55ch; margin:0 auto; line-height:1.6;">We're putting together a list of our favorite spots in San Francisco — check back soon!</p>
+      <img class="doodle doodle-flowers" src="doodles/flowers.svg" alt="" aria-hidden="true" />
     </div>`;
   } else if (state.activeTab === "registry") {
     tabHtml = `<h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Registry</h2>
