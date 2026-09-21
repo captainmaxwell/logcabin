@@ -435,7 +435,12 @@ const RSVP_DEADLINE = "Saturday, April 3, 2027"; // 4 weeks before the wedding �
 
 // Flip to false once full details (registry, attire, brunch logistics) are
 // ready to share. Nothing behind this flag is deleted — just hidden.
-const SAVE_THE_DATE_MODE = true;
+//
+// `?preview=1` on the URL previews the site as it'll look once this flips to
+// false, on this device only — the committed value below (what every other
+// visitor gets) doesn't change. Not real security, same as everything else
+// gated by this flag: it's a query param in page source, not a passcode.
+const SAVE_THE_DATE_MODE = new URLSearchParams(location.search).get("preview") === "1" ? false : true;
 
 // PBKDF2-derived hash of the shared save-the-date password, after
 // normalizeName(). Stored as salt + iterations + derived hash so the password
