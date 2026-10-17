@@ -149,7 +149,7 @@
   }
   .btn {
     border: none; background: var(--sangria); color: var(--cream);
-    font-weight: 700; padding: 10px 22px; border-radius: 999px; cursor: pointer;
+    font-size: 15px; font-weight: 700; padding: 10px 22px; border-radius: 999px; cursor: pointer;
     box-shadow: 0 1px 4px rgba(61,38,33,0.2);
     transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
   }
@@ -1122,7 +1122,7 @@ function render() {
       <a class="btn" href="${HOTEL.bookingLink}" target="_blank" rel="noopener" style="display:inline-block; text-decoration:none; margin:18px 0 0;">Book your room &rarr;</a>
 
       <h3 class="hotel-label">Booking dates</h3>
-      <p>The link lets you book Friday, April 30 to Sunday, May 2. If you want to stay longer, book through the link first, then email Argonaut booking coordinator ${HOTEL.contactName} (<a href="mailto:${HOTEL.contactEmail}" style="color:var(--sangria);">${HOTEL.contactEmail}</a>) with your reservation details and they'll adjust your dates. The group rate is available from Thursday April 29 to Monday May 3.</p>
+      <p>The link lets you book Friday, April 30 to Sunday, May 2. If you'd like to stay longer, book through the link first, then email Argonaut booking coordinator ${HOTEL.contactName} (<a href="mailto:${HOTEL.contactEmail}" style="color:var(--sangria);">${HOTEL.contactEmail}</a>) with your reservation details and they'll adjust your dates. The group rate is available from Thursday April 29 to Monday May 3.</p>
 
       <p>If you prefer to call, phone the hotel at <a href="tel:+1${HOTEL.phone.replace(/-/g, "")}" style="color:var(--sangria); white-space:nowrap;">${HOTEL.phone}</a> (${HOTEL.phoneHours}) and mention the <strong>${HOTEL.groupName}</strong>.</p>
 
