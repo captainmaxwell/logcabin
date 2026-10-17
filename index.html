@@ -647,7 +647,7 @@ const ALL_TABS = [
   { id: "home", label: "Home" },
   { id: "events", label: "Events" },
   { id: "rsvp", label: "RSVP" },
-  { id: "lodging", label: "Where to Stay" },
+  { id: "lodging", label: HOTEL_BLOCK_LIVE ? "Travel & Accommodations" : "Where to Stay" },
   { id: "todo", label: "Things to Do" },
   { id: "gallery", label: "Gallery" },
   { id: "registry", label: "Registry" },
@@ -968,7 +968,7 @@ function render() {
         <img class="doodle doodle-cabin doodle-center" src="doodles/cabin-bridge-animated-hires.gif" alt="The Log Cabin in the Presidio, with the Golden Gate Bridge" />
         <p style="max-width:52ch; margin:0 auto; font-size:16px; line-height:1.6;">We hope you can join us for our wedding celebration at the Log Cabin in San Francisco's Presidio on May 1, 2027!</p>
         <p style="max-width:52ch; margin:12px auto 0; font-size:16px; line-height:1.6;">We'll send you a formal invite with RSVP details closer to the date.</p>
-        ${HOTEL_BLOCK_LIVE ? `<p style="max-width:52ch; margin:18px auto 0; font-size:16px; line-height:1.6;">Our hotel block is open — book by ${HOTEL.bookBy}. <a href="#" data-goto-tab="lodging" style="color:var(--sangria); font-weight:700;">Where to stay &rarr;</a></p>` : ""}
+        ${HOTEL_BLOCK_LIVE ? `<p style="max-width:52ch; margin:18px auto 0; font-size:16px; line-height:1.6;">Our hotel block is open — book by ${HOTEL.bookBy}. <a href="#" data-goto-tab="lodging" style="color:var(--sangria); font-weight:700;">Travel &amp; accommodations &rarr;</a></p>` : ""}
       </div>`;
   } else if (state.activeTab === "gallery") {
     // loading="lazy" so the lower photos don't compete with the first paint —
@@ -1110,7 +1110,7 @@ function render() {
     }
   } else if (state.activeTab === "lodging") {
     tabHtml = HOTEL_BLOCK_LIVE ? `<div class="events-page hotel">
-      <h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Where to Stay</h2>
+      <h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Travel &amp; Accommodations</h2>
       <p>We'll be staying at the <strong>${HOTEL.name}</strong> at Fisherman's Wharf, and we'd love for you to join us! We've reserved a block of rooms with a group discount if you book by <strong>${HOTEL.bookBy}</strong>.</p>
       <p>Weekend events will be in this area. It’s a short drive from the Log Cabin (our venue) and we’ll have a shuttle to take guests there on Saturday.</p>
       <p><a href="${HOTEL.mapLink}" target="_blank" rel="noopener" style="color:var(--sangria); font-weight:700;">View on Google Maps &rarr;</a></p>
@@ -1126,6 +1126,11 @@ function render() {
       <p>The link lets you book Friday, April 30 to Sunday, May 2. If you'd like to stay longer, book through the link first, then email Argonaut booking coordinator ${HOTEL.contactName} (<a href="mailto:${HOTEL.contactEmail}" style="color:var(--sangria);">${HOTEL.contactEmail}</a>) with your reservation details and they'll adjust your dates. The group rate is available from Thursday April 29 to Monday May 3.</p>
 
       <p>You can also book by calling at <a href="tel:+1${HOTEL.phone.replace(/-/g, "")}" style="color:var(--sangria); white-space:nowrap;">${HOTEL.phone}</a> (${HOTEL.phoneHours}) and mention the <strong>${HOTEL.groupName}</strong>.</p>
+
+      <h3 class="hotel-label">Getting around</h3>
+      <p>The Argonaut is about 30 minutes by car from San Francisco International Airport (SFO), depending on traffic.</p>
+      <p>You probably won't need a rental car. Parking in the city is expensive and hard to find, and our shuttle will take you to the Log Cabin on Saturday.</p>
+      <p>Ubers and Lyfts are easy to get around Fisherman's Wharf, so getting anywhere else in the city is simple.</p>
 
       <img class="doodle doodle-train" src="doodles/f-train.svg" alt="An F-line streetcar" />
     </div>` : `<div class="events-page">
