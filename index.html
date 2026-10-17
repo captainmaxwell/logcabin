@@ -326,7 +326,6 @@
   .doodle-puppies { width: min(150px, 46%); margin: 20px auto 0; transform: rotate(-3deg); }
   .doodle-flowers { width: min(200px, 56%); margin: 26px auto 0; transform: rotate(-2deg); }
   .hotel p { max-width: 55ch; margin: 0 auto 10px; line-height: 1.6; }
-  .doodle-divider { width: 110px; margin: 34px auto 0; transform: rotate(-3deg); }
   .hotel-photo { display: block; width: 100%; max-width: 560px; aspect-ratio: 3 / 2; object-fit: cover; object-position: 50% 58%; margin: 18px auto 0; }
   .hotel-label { font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin: 28px 0 8px; }
   .hotel-rooms { list-style: none; padding: 0; margin: 0 auto; line-height: 1.9; font-size: 15px; }
@@ -1111,14 +1110,12 @@ function render() {
     }
   } else if (state.activeTab === "lodging") {
     tabHtml = HOTEL_BLOCK_LIVE ? `<div class="events-page hotel">
-      <h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Travel</h2>
+      <h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Getting There</h2>
       <p>San Francisco International Airport (SFO) is about 30 minutes from the city by car, depending on traffic.</p>
       <p>You probably won't need a rental car. Parking in the city is expensive and hard to find, and we'll have a shuttle to take guests to the Log Cabin on Saturday.</p>
       <p>Ubers and Lyfts are easy to get around the city.</p>
 
-      <img class="doodle doodle-divider" src="doodles/f-train.svg" alt="" aria-hidden="true" />
-
-      <h2 class="display" style="font-size:28px; color:var(--sangria); margin:14px 0 14px;">Accommodations</h2>
+      <h2 class="display" style="font-size:28px; color:var(--sangria); margin:44px 0 14px;">Where to Stay</h2>
       <p>We'll be staying at the <strong>${HOTEL.name}</strong> at Fisherman's Wharf, and we'd love for you to join us! We've reserved a block of rooms with a group discount if you book by <strong>${HOTEL.bookBy}</strong>.</p>
       <p>Weekend events will be in this area. It’s a short drive from the Log Cabin (our venue) and we’ll have a shuttle to take guests there on Saturday.</p>
       <p><a href="${HOTEL.mapLink}" target="_blank" rel="noopener" style="color:var(--sangria); font-weight:700;">View on Google Maps &rarr;</a></p>
@@ -1134,6 +1131,8 @@ function render() {
       <p>The link lets you book Friday, April 30 to Sunday, May 2. If you'd like to stay longer, book through the link first, then email Argonaut booking coordinator ${HOTEL.contactName} (<a href="mailto:${HOTEL.contactEmail}" style="color:var(--sangria);">${HOTEL.contactEmail}</a>) with your reservation details and they'll adjust your dates. The group rate is available from Thursday April 29 to Monday May 3.</p>
 
       <p>You can also book by calling at <a href="tel:+1${HOTEL.phone.replace(/-/g, "")}" style="color:var(--sangria); white-space:nowrap;">${HOTEL.phone}</a> (${HOTEL.phoneHours}) and mention the <strong>${HOTEL.groupName}</strong>.</p>
+
+      <img class="doodle doodle-train" src="doodles/f-train.svg" alt="An F-line streetcar" />
     </div>` : `<div class="events-page">
       <h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Where to Stay</h2>
       <p style="max-width:55ch; margin:0 auto; line-height:1.6;">We're working on a hotel room block near Fisherman's Wharf. Details and recommendations coming soon.</p>
