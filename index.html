@@ -325,6 +325,10 @@
   .doodle-train { width: min(260px, 70%); margin: 26px auto 0; transform: rotate(2deg); }
   .doodle-puppies { width: min(150px, 46%); margin: 20px auto 0; transform: rotate(-3deg); }
   .doodle-flowers { width: min(200px, 56%); margin: 26px auto 0; transform: rotate(-2deg); }
+  .hotel p { max-width: 55ch; margin: 0 auto 10px; line-height: 1.6; }
+  .hotel-warn { font-size: 14px; color: var(--sangria); }
+  .hotel-label { font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin: 28px 0 8px; }
+  .hotel-rooms { list-style: none; padding: 0; margin: 0 auto; line-height: 1.9; font-size: 15px; }
   .party-table { border-top: 1.5px solid var(--plum); }
   .party-row {
     padding: 14px 0; border-bottom: 1.5px solid var(--plum);
@@ -440,7 +444,14 @@ const RSVP_DEADLINE = "Saturday, April 3, 2027"; // 4 weeks before the wedding �
 // false, on this device only — the committed value below (what every other
 // visitor gets) doesn't change. Not real security, same as everything else
 // gated by this flag: it's a query param in page source, not a passcode.
-const SAVE_THE_DATE_MODE = new URLSearchParams(location.search).get("preview") === "1" ? false : true;
+const PREVIEW = new URLSearchParams(location.search).get("preview");
+const SAVE_THE_DATE_MODE = PREVIEW === "1" ? false : true;
+
+// Flip to true to show the hotel block on Lodging (and a nudge on Home) to
+// everyone. Independent of SAVE_THE_DATE_MODE so the hotel can launch before
+// RSVPs do. `?preview=hotel` shows it on this device only; `?preview=1`
+// includes it too, since that one previews everything.
+const HOTEL_BLOCK_LIVE = false || PREVIEW === "hotel" || PREVIEW === "1";
 
 // PBKDF2-derived hash of the shared save-the-date password, after
 // normalizeName(). Stored as salt + iterations + derived hash so the password
@@ -499,6 +510,25 @@ function daysUntilWedding() {
 const VENUE_MAP_LINK = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent("The Log Cabin, Presidio, San Francisco, CA");
 const VENUE_MAP_ANCHOR = `<a href="${VENUE_MAP_LINK}" target="_blank" rel="noopener" style="color:var(--sangria); font-weight:700;">View on Google Maps &rarr;</a>`;
 const VENUE_MAP_HTML = `<br>${VENUE_MAP_ANCHOR}`;
+
+const HOTEL = {
+  name: "Argonaut Hotel",
+  mapLink: "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent("Argonaut Hotel, 495 Jefferson St, San Francisco, CA"),
+  // The group code and dates are baked into this link — booking without it
+  // misses the block rate.
+  bookingLink: "https://be.synxis.com/?Hotel=65957&Chain=11910&arrive=2027-04-30&depart=2027-05-02&adult=1&child=0&group=LG430WB",
+  bookBy: "March 31, 2027",
+  rooms: [
+    { tier: "Standard", view: "Courtyard view", beds: "king or 2 queens", rate: "$247" },
+    { tier: "Deluxe", view: "City view", beds: "king or 2 queens", rate: "$277" },
+    { tier: "Bay View", view: "Water view", beds: "king", rate: "$347" },
+  ],
+  contactName: "Jens Schewe",
+  contactEmail: "jschewe@noblehousehotels.com",
+  phone: "415-345-5508",
+  phoneHours: "8am–5pm Pacific",
+  groupName: "Lin and Gailey Wedding Group",
+};
 
 const CEREMONY = { doodles: [{ file: "rings.svg", tilt: "tilt-b" }, { file: "cake.svg", tilt: "tilt-c" }], id: "ceremony-reception", day: "Saturday", dateShort: "May 1, 2027", title: "Ceremony &amp; Reception", date: "Saturday, May 1, 2027", time: "4:00 PM &ndash; 10:00 PM", location: "The Log Cabin, Presidio", detail: `The ceremony will be outside with the Golden Gate Bridge in view (fog permitting) &mdash; then we'll move inside for drinks, dinner, and dancing!${VENUE_MAP_HTML}` };
 
@@ -938,6 +968,7 @@ function render() {
         <img class="doodle doodle-cabin doodle-center" src="doodles/cabin-bridge-animated-hires.gif" alt="The Log Cabin in the Presidio, with the Golden Gate Bridge" />
         <p style="max-width:52ch; margin:0 auto; font-size:16px; line-height:1.6;">We hope you can join us for our wedding celebration at the Log Cabin in San Francisco's Presidio on May 1, 2027!</p>
         <p style="max-width:52ch; margin:12px auto 0; font-size:16px; line-height:1.6;">We'll send you a formal invite with RSVP details closer to the date.</p>
+        ${HOTEL_BLOCK_LIVE ? `<p style="max-width:52ch; margin:18px auto 0; font-size:16px; line-height:1.6;">Our hotel block is open — book by ${HOTEL.bookBy}. <a href="#" data-goto-tab="lodging" style="color:var(--sangria); font-weight:700;">Where to stay &rarr;</a></p>` : ""}
       </div>`;
   } else if (state.activeTab === "gallery") {
     // loading="lazy" so the lower photos don't compete with the first paint —
@@ -1078,7 +1109,26 @@ function render() {
       `;
     }
   } else if (state.activeTab === "lodging") {
-    tabHtml = `<div class="events-page">
+    tabHtml = HOTEL_BLOCK_LIVE ? `<div class="events-page hotel">
+      <h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Where to Stay</h2>
+      <p>We've reserved a block of rooms at the <strong>${HOTEL.name}</strong> at Fisherman's Wharf, with a group discount if you book by <strong>${HOTEL.bookBy}</strong>.</p>
+      <p><a href="${HOTEL.mapLink}" target="_blank" rel="noopener" style="color:var(--sangria); font-weight:700;">View on Google Maps &rarr;</a></p>
+      <a class="btn" href="${HOTEL.bookingLink}" target="_blank" rel="noopener" style="display:inline-block; text-decoration:none; margin:10px 0 6px;">Book your room &rarr;</a>
+      <p class="hotel-warn">The link books Friday, April 30 to Sunday, May 2. Change the number of guests if you need to, but leave the dates as they are or you'll lose the group rate.</p>
+
+      <h3 class="hotel-label">Rooms</h3>
+      <ul class="hotel-rooms">
+        ${HOTEL.rooms.map(r => `<li><strong>${r.tier}</strong> &middot; ${r.view}, ${r.beds} &middot; ${r.rate}/night</li>`).join("")}
+      </ul>
+
+      <h3 class="hotel-label">Staying longer?</h3>
+      <p>The group rate runs from Thursday, April 29 to Monday, May 3. Book through the link first, then email ${HOTEL.contactName} at the hotel (<a href="mailto:${HOTEL.contactEmail}" style="color:var(--sangria);">${HOTEL.contactEmail}</a>) with your reservation details and they'll adjust your dates. Ask for adjoining rooms in the same email.</p>
+
+      <h3 class="hotel-label">Rather call?</h3>
+      <p>Call the hotel at <a href="tel:+1${HOTEL.phone.replace(/-/g, "")}" style="color:var(--sangria);">${HOTEL.phone}</a> (${HOTEL.phoneHours}) and mention the <strong>${HOTEL.groupName}</strong>.</p>
+
+      <img class="doodle doodle-train" src="doodles/f-train.svg" alt="An F-line streetcar" />
+    </div>` : `<div class="events-page">
       <h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Where to Stay</h2>
       <p style="max-width:55ch; margin:0 auto; line-height:1.6;">We're working on a hotel room block near Fisherman's Wharf. Details and recommendations coming soon.</p>
       <img class="doodle doodle-train" src="doodles/f-train.svg" alt="An F-line streetcar" />
@@ -1125,6 +1175,9 @@ function render() {
 
   document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.addEventListener("click", () => { state.activeTab = btn.dataset.tab; saveSession(); render(); });
+  });
+  document.querySelectorAll("[data-goto-tab]").forEach(a => {
+    a.addEventListener("click", (e) => { e.preventDefault(); state.activeTab = a.dataset.gotoTab; saveSession(); render(); window.scrollTo(0, 0); });
   });
 
   document.querySelectorAll(".gallery img").forEach(img => {
