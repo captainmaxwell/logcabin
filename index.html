@@ -326,7 +326,6 @@
   .doodle-puppies { width: min(150px, 46%); margin: 20px auto 0; transform: rotate(-3deg); }
   .doodle-flowers { width: min(200px, 56%); margin: 26px auto 0; transform: rotate(-2deg); }
   .hotel p { max-width: 55ch; margin: 0 auto 10px; line-height: 1.6; }
-  .hotel-warn { color: var(--sangria); }
   .hotel-photo { display: block; width: 100%; max-width: 560px; height: auto; margin: 18px auto 0; }
   .hotel-label { font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin: 28px 0 8px; }
   .hotel-rooms { list-style: none; padding: 0; margin: 0 auto; line-height: 1.9; font-size: 15px; }
@@ -1123,8 +1122,7 @@ function render() {
       <a class="btn" href="${HOTEL.bookingLink}" target="_blank" rel="noopener" style="display:inline-block; text-decoration:none; margin:18px 0 0;">Book your room &rarr;</a>
 
       <h3 class="hotel-label">Your dates</h3>
-      <p>The link books <strong>Friday, April 30 to Sunday, May 2</strong>. <span class="hotel-warn">Keep those dates when you book, or you'll lose the group rate.</span></p>
-      <p>Staying longer? The rate runs from Thursday, April 29 to Monday, May 3. Book through the link first, then email ${HOTEL.contactName} at the hotel (<a href="mailto:${HOTEL.contactEmail}" style="color:var(--sangria);">${HOTEL.contactEmail}</a>) with your reservation details and they'll adjust your dates. Ask for adjoining rooms in the same email.</p>
+      <p>The link lets you book Friday, April 30 to Sunday, May 2. If you want to stay longer, book through the link first, then email Argonaut booking coordinator ${HOTEL.contactName} (<a href="mailto:${HOTEL.contactEmail}" style="color:var(--sangria);">${HOTEL.contactEmail}</a>) with your reservation details and they'll adjust your dates. The group rate is available from Thursday April 29 to Monday May 3.</p>
 
       <h3 class="hotel-label">Rather call?</h3>
       <p>Call the hotel at <a href="tel:+1${HOTEL.phone.replace(/-/g, "")}" style="color:var(--sangria);">${HOTEL.phone}</a> (${HOTEL.phoneHours}) and mention the <strong>${HOTEL.groupName}</strong>.</p>
