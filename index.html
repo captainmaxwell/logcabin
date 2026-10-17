@@ -326,6 +326,7 @@
   .doodle-puppies { width: min(150px, 46%); margin: 20px auto 0; transform: rotate(-3deg); }
   .doodle-flowers { width: min(200px, 56%); margin: 26px auto 0; transform: rotate(-2deg); }
   .hotel p { max-width: 55ch; margin: 0 auto 10px; line-height: 1.6; }
+  .doodle-divider { width: 110px; margin: 34px auto 0; transform: rotate(-3deg); }
   .hotel-photo { display: block; width: 100%; max-width: 560px; aspect-ratio: 3 / 2; object-fit: cover; object-position: 50% 58%; margin: 18px auto 0; }
   .hotel-label { font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin: 28px 0 8px; }
   .hotel-rooms { list-style: none; padding: 0; margin: 0 auto; line-height: 1.9; font-size: 15px; }
@@ -1127,12 +1128,12 @@ function render() {
 
       <p>You can also book by calling at <a href="tel:+1${HOTEL.phone.replace(/-/g, "")}" style="color:var(--sangria); white-space:nowrap;">${HOTEL.phone}</a> (${HOTEL.phoneHours}) and mention the <strong>${HOTEL.groupName}</strong>.</p>
 
+      <img class="doodle doodle-divider" src="doodles/f-train.svg" alt="" aria-hidden="true" />
+
       <h3 class="hotel-label">Getting around</h3>
       <p>The Argonaut is about 30 minutes by car from San Francisco International Airport (SFO), depending on traffic.</p>
       <p>You probably won't need a rental car. Parking in the city is expensive and hard to find, and our shuttle will take you to the Log Cabin on Saturday.</p>
       <p>Ubers and Lyfts are easy to get around Fisherman's Wharf, so getting anywhere else in the city is simple.</p>
-
-      <img class="doodle doodle-train" src="doodles/f-train.svg" alt="An F-line streetcar" />
     </div>` : `<div class="events-page">
       <h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Where to Stay</h2>
       <p style="max-width:55ch; margin:0 auto; line-height:1.6;">We're working on a hotel room block near Fisherman's Wharf. Details and recommendations coming soon.</p>
