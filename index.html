@@ -531,6 +531,25 @@ const HOTEL = {
   groupName: "Lin and Gailey Wedding Group",
 };
 
+// Day ideas for Things to Do, copied from the couple's My Maps layers (the
+// KML exports live in originals/). Map links are search URLs for the same
+// reason as VENUE_MAP_LINK above.
+const mapSearch = q => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(q);
+const GUEST_MAP_VIEW = "https://www.google.com/maps/d/viewer?mid=1Av_uSDG7AQJWVLYWT-JAmJoxxYMho14";
+const GUEST_MAP_EMBED = "https://www.google.com/maps/d/embed?mid=1Av_uSDG7AQJWVLYWT-JAmJoxxYMho14&ll=37.790714,-122.415015&z=13";
+const TODO_DAYS = [
+  {
+    title: "Embarcadero Train Day",
+    intro: "<strong>Historic F Market Streetcar:</strong> Our top recommendation for seeing the Embarcadero. Enjoy a ride in a historic train car from Fisherman's Wharf to the Ferry Building.",
+    stops: [
+      { name: "Ferry Plaza Farmers Market", map: mapSearch("Ferry Plaza Farmers Market, San Francisco, CA") },
+      { name: "San Francisco Railway Museum", map: mapSearch("San Francisco Railway Museum, 77 Steuart St, San Francisco, CA") },
+      { name: "Lunette", map: mapSearch("Lunette, Ferry Building, San Francisco, CA") },
+      { name: "Pier 23 Cafe Restaurant &amp; Bar", map: mapSearch("Pier 23 Cafe, San Francisco, CA") },
+    ],
+  },
+];
+
 const CEREMONY = { doodles: [{ file: "rings.svg", tilt: "tilt-b" }, { file: "cake.svg", tilt: "tilt-c" }], id: "ceremony-reception", day: "Saturday", dateShort: "May 1, 2027", title: "Ceremony &amp; Reception", date: "Saturday, May 1, 2027", time: "4:00 PM &ndash; 10:00 PM", location: "The Log Cabin, Presidio", detail: `The ceremony will be outside with the Golden Gate Bridge in view (fog permitting) &mdash; then we'll move inside for drinks, dinner, and dancing!${VENUE_MAP_HTML}` };
 
 const FAREWELL_BREAKFAST = { doodle: "flowers.svg", tilt: "tilt-c", id: "brunch", day: "Sunday", dateShort: "May 2, 2027", title: "Farewell Breakfast", date: "Sunday, May 2, 2027", time: "", location: "", detail: "Casual meetup for those who stick around Sunday &mdash; we'll share details closer to the date." };
@@ -1142,8 +1161,14 @@ function render() {
   } else if (state.activeTab === "todo") {
     tabHtml = `<div class="events-page">
       <h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Things to Do</h2>
-      <p style="max-width:55ch; margin:0 auto; line-height:1.6;">We're putting together a list of our favorite spots in San Francisco — check back soon!</p>
-      <iframe class="todo-map" src="https://www.google.com/maps/d/embed?mid=1Av_uSDG7AQJWVLYWT-JAmJoxxYMho14&ll=37.790714,-122.415015&z=13" title="Map of our favorite spots in San Francisco" loading="lazy"></iframe>
+      <p style="max-width:55ch; margin:0 auto; line-height:1.6;">Here's one of our favorite ways to spend a day in San Francisco. More ideas coming soon!</p>
+      ${TODO_DAYS.map(d => `
+        <h3 class="display" style="font-size:24px; color:var(--sangria); margin:34px 0 10px;">${d.title}</h3>
+        <p style="max-width:55ch; margin:0 auto; line-height:1.6;">${d.intro}</p>
+        <h4 class="hotel-label">Stops along the way</h4>
+        <ul class="hotel-rooms">${d.stops.map(st => `<li>${st.name} &middot; <a href="${st.map}" target="_blank" rel="noopener" style="color:var(--sangria); white-space:nowrap;">Map &rarr;</a></li>`).join("")}</ul>`).join("")}
+      <iframe class="todo-map" src="${GUEST_MAP_EMBED}" title="Map of our favorite spots in San Francisco" loading="lazy"></iframe>
+      <p style="margin:10px 0 0;"><a href="${GUEST_MAP_VIEW}" target="_blank" rel="noopener" style="color:var(--sangria); font-weight:700;">Open the full map &rarr;</a></p>
       <img class="doodle doodle-flowers" src="doodles/flowers.svg" alt="" aria-hidden="true" />
     </div>`;
   } else if (state.activeTab === "registry") {
