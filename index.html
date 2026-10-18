@@ -324,6 +324,7 @@
   .doodle-cabin { width: min(380px, 88%); margin: 4px auto 22px; transform: rotate(-1.5deg); }
   .doodle-train { width: min(260px, 70%); margin: 26px auto 0; transform: rotate(2deg); }
   .doodle-puppies { width: min(150px, 46%); margin: 20px auto 0; transform: rotate(-3deg); }
+  .todo-map { display: block; width: 100%; max-width: 640px; height: 420px; border: 0; margin: 22px auto 0; }
   .doodle-flowers { width: min(200px, 56%); margin: 26px auto 0; transform: rotate(-2deg); }
   .hotel p { max-width: 55ch; margin: 0 auto 10px; line-height: 1.6; }
   .hotel-photo { display: block; width: 100%; max-width: 560px; aspect-ratio: 3 / 2; object-fit: cover; object-position: 50% 58%; margin: 18px auto 0; }
@@ -656,10 +657,10 @@ const ALL_TABS = [
 // Registry and RSVP aren't deleted, just hidden from the nav while
 // save-the-date mode is on — their render logic and the whole RSVP/plus-one
 // backend path further down are untouched, so flipping SAVE_THE_DATE_MODE to
-// false brings them straight back. Things to Do is still being written, so
-// it's hidden the same way — add it back to ALL_TABS's nav order once it's
-// ready to remove from this list.
-const HIDDEN_IN_SAVE_THE_DATE = ["registry", "rsvp", "faq", "todo"];
+// false brings them straight back. Things to Do launches with the hotel
+// block, so it's shown whenever HOTEL_BLOCK_LIVE is on, even in save-the-date
+// mode.
+const HIDDEN_IN_SAVE_THE_DATE = ["registry", "rsvp", "faq"].concat(HOTEL_BLOCK_LIVE ? [] : ["todo"]);
 const TABS = SAVE_THE_DATE_MODE
   ? ALL_TABS.filter(t => !HIDDEN_IN_SAVE_THE_DATE.includes(t.id))
   : ALL_TABS;
@@ -1142,6 +1143,7 @@ function render() {
     tabHtml = `<div class="events-page">
       <h2 class="display" style="font-size:28px; color:var(--sangria); margin-bottom:14px;">Things to Do</h2>
       <p style="max-width:55ch; margin:0 auto; line-height:1.6;">We're putting together a list of our favorite spots in San Francisco — check back soon!</p>
+      <iframe class="todo-map" src="https://www.google.com/maps/d/embed?mid=1Av_uSDG7AQJWVLYWT-JAmJoxxYMho14&ll=37.790714,-122.415015&z=13" title="Map of our favorite spots in San Francisco" loading="lazy"></iframe>
       <img class="doodle doodle-flowers" src="doodles/flowers.svg" alt="" aria-hidden="true" />
     </div>`;
   } else if (state.activeTab === "registry") {
