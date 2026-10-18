@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Embarcadero Train Day</name>
+    <Style id="icon-1517-673AB7-nodesc-normal">
+      <IconStyle>
+        <color>ffb73a67</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="icon-1517-673AB7-nodesc-highlight">
+      <IconStyle>
+        <color>ffb73a67</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <StyleMap id="icon-1517-673AB7-nodesc">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1517-673AB7-nodesc-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1517-673AB7-nodesc-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1577-673AB7-nodesc-normal">
+      <IconStyle>
+        <color>ffb73a67</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="icon-1577-673AB7-nodesc-highlight">
+      <IconStyle>
+        <color>ffb73a67</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <StyleMap id="icon-1577-673AB7-nodesc">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1577-673AB7-nodesc-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1577-673AB7-nodesc-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="icon-1713-673AB7-nodesc-normal">
+      <IconStyle>
+        <color>ffb73a67</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="icon-1713-673AB7-nodesc-highlight">
+      <IconStyle>
+        <color>ffb73a67</color>
+        <scale>1</scale>
+        <Icon>
+          <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1</scale>
+      </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <StyleMap id="icon-1713-673AB7-nodesc">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#icon-1713-673AB7-nodesc-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#icon-1713-673AB7-nodesc-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="line-B2EBF2-2744-normal">
+      <LineStyle>
+        <color>fff2ebb2</color>
+        <width>2.744</width>
+      </LineStyle>
+    </Style>
+    <Style id="line-B2EBF2-2744-highlight">
+      <LineStyle>
+        <color>fff2ebb2</color>
+        <width>4.116</width>
+      </LineStyle>
+    </Style>
+    <StyleMap id="line-B2EBF2-2744">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#line-B2EBF2-2744-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#line-B2EBF2-2744-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Placemark>
+      <name><![CDATA[Pier 23 Cafe Restaurant & Bar]]></name>
+      <styleUrl>#icon-1517-673AB7-nodesc</styleUrl>
+      <Point>
+        <coordinates>
+          -122.4008661,37.8033934,0
+        </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Ferry Plaza Farmers Market</name>
+      <styleUrl>#icon-1577-673AB7-nodesc</styleUrl>
+      <Point>
+        <coordinates>
+          -122.3936029,37.7953186,0
+        </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>San Francisco Railway Museum</name>
+      <styleUrl>#icon-1713-673AB7-nodesc</styleUrl>
+      <Point>
+        <coordinates>
+          -122.3935533,37.7938256,0
+        </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Lunette</name>
+      <styleUrl>#icon-1577-673AB7-nodesc</styleUrl>
+      <Point>
+        <coordinates>
+          -122.3929823,37.7952178,0
+        </coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Historic F Market Streetcar</name>
+      <description><![CDATA[<img src="https://mymaps.usercontent.google.com/hostedimage/m/*/3AAjQbR5NoWLo1SHt4u_o-BhdeuGmchVv5Wj3U45u53_oA85j9Il1WLP8baL9KJ9EBu9HkMrQ_J3oE0f8vJ9dmBTU7QX05yy7QRKgp1sBZ8PmTjrVUqXEDwc26SjFj_5ZlLGt1U4H36WFIxR5SC8WbHPciqiozj8IgkRKlhyHWZcPHllFFlgCRMA0HarMRVxU_9-_1YvekwUk5ziu6a1ipV5fSgQnfkpOADSaHY1T7VGtxkT7WNgh8ZsO9J6SdcA?authuser=0&fife=s16383" height="200" width="auto" /><br><br>Our top recommendation for seeing the Embarcadero. Enjoy a ride in a historic train car from Fisherman's Wharf to the Ferry Building.]]></description>
+      <styleUrl>#line-B2EBF2-2744</styleUrl>
+      <ExtendedData>
+        <Data name="gx_media_links">
+          <value><![CDATA[https://mymaps.usercontent.google.com/hostedimage/m/*/3AAjQbR5NoWLo1SHt4u_o-BhdeuGmchVv5Wj3U45u53_oA85j9Il1WLP8baL9KJ9EBu9HkMrQ_J3oE0f8vJ9dmBTU7QX05yy7QRKgp1sBZ8PmTjrVUqXEDwc26SjFj_5ZlLGt1U4H36WFIxR5SC8WbHPciqiozj8IgkRKlhyHWZcPHllFFlgCRMA0HarMRVxU_9-_1YvekwUk5ziu6a1ipV5fSgQnfkpOADSaHY1T7VGtxkT7WNgh8ZsO9J6SdcA?authuser=0&fife=s16383]]></value>
+        </Data>
+      </ExtendedData>
+      <LineString>
+        <tessellate>1</tessellate>
+        <coordinates>
+          -122.4174752,37.8070991,0
+          -122.4089849,37.8081417,0
+          -122.4023285,37.8041739,0
+          -122.3941689,37.7953859,0
+        </coordinates>
+      </LineString>
+    </Placemark>
+  </Document>
+</kml>
